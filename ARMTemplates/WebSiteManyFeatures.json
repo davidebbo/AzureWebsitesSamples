@@ -100,7 +100,8 @@
           ],
           "properties": {
             "AppSettingKey1": "Some value",
-            "AppSettingKey2": "My second setting"
+            "AppSettingKey2": "My second setting",
+            "AppSettingKey3": "My third setting"
           }
         },
         {
@@ -113,6 +114,18 @@
           "properties": {
             "ConnString1": { "value": "My custom connection string", "type": "custom" },
             "ConnString2": { "value": "My SQL connection string", "type": "SQLAzure" }
+          }
+        },
+        {
+          "apiVersion": "2014-11-01",
+          "name": "slotconfignames",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": {
+            "connectionStringNames": [ "ConnString1" ],
+            "appSettingNames": [ "AppSettingKey1", "AppSettingKey2" ]
           }
         },
         {
@@ -134,8 +147,9 @@
                 "[resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), 'Staging')]"
               ],
               "properties": {
-                "AppSettingKey1": "Some value222",
-                "AppSettingKey2": "My second setting222"
+                "AppSettingKey1": "Some staging value",
+                "AppSettingKey2": "My second staging setting",
+                "AppSettingKey3": "My third staging setting"
               }
             }
           ]
