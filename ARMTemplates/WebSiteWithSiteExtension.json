@@ -39,6 +39,19 @@
           ],
           "properties": {
           }
+        },
+        {
+          "apiVersion": "2014-11-01",
+          "name": "SettingsAPISample/foo",
+          "type": "extensions/settings",
+          "dependsOn": [
+            "[parameters('siteName')]",
+            "[resourceId('Microsoft.Web/Sites/siteextensions', parameters('siteName'), 'SettingsAPISample')]"
+          ],
+          "properties": {
+            "value": "My value",
+            "count": 17
+          }
         }
       ]
     }
