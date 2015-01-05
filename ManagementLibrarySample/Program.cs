@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.Resources;
 using Microsoft.Azure.Management.Resources.Models;
@@ -32,9 +33,12 @@ namespace ManagementLibrarySample
             // Get the credentials
             SubscriptionCloudCredentials cloudCreds = GetCredsFromServicePrincipal();
 
-            // Use them to create the clients we need
-            _resourceGroupClient = new ResourceManagementClient(cloudCreds);
-            _websiteClient = new WebSiteManagementClient(cloudCreds);
+            // Create our own HttpClient so we can do logging
+            HttpClient httpClient = new HttpClient(new LoggingHandler(new HttpClientHandler()));
+
+            // Use the creds to create the clients we need
+            _resourceGroupClient = new ResourceManagementClient(cloudCreds, httpClient);
+            _websiteClient = new WebSiteManagementClient(cloudCreds, httpClient);
 
             await ListResourceGroupsAndSites();
 
@@ -66,14 +70,14 @@ namespace ManagementLibrarySample
         static async Task ListResourceGroupsAndSites()
         {
             // Go through all the resource groups in the subscription
-            ResourceGroupListResult res = await _resourceGroupClient.ResourceGroups.ListAsync(new ResourceGroupListParameters());
-            foreach (var rg in res.ResourceGroups)
+            var rgListResult = await _resourceGroupClient.ResourceGroups.ListAsync(new ResourceGroupListParameters());
+            foreach (var rg in rgListResult.ResourceGroups)
             {
                 Console.WriteLine(rg.Name);
 
                 // Go through all the Websites in the resource group
-                WebSiteListResponse sites = await _websiteClient.WebSites.ListAsync(rg.Name, null, new WebSiteListParameters());
-                foreach (var site in sites)
+                var siteListResult = await _websiteClient.WebSites.ListAsync(rg.Name, null, new WebSiteListParameters());
+                foreach (var site in siteListResult)
                 {
                     Console.WriteLine("    " + site.Name);
                 }
@@ -82,8 +86,10 @@ namespace ManagementLibrarySample
 
         static async Task CreateSite(string rgName, string whpName, string siteName, string location)
         {
-            var res2 = await _resourceGroupClient.ResourceGroups.CreateOrUpdateAsync(rgName, new BasicResourceGroup { Location = location });
+            // Create/Update the resource group
+            var rgCreateResult = await _resourceGroupClient.ResourceGroups.CreateOrUpdateAsync(rgName, new BasicResourceGroup { Location = location });
 
+            // Create/Update the Web Hosting Plan
             var whpCreateParams = new WebHostingPlanCreateOrUpdateParameters
             {
                 WebHostingPlan = new WebHostingPlan
@@ -96,9 +102,9 @@ namespace ManagementLibrarySample
                     }
                 }
             };
+            var whpCreateResult = await _websiteClient.WebHostingPlans.CreateOrUpdateAsync(rgName, whpCreateParams);
 
-            WebHostingPlanCreateOrUpdateResponse whpCreateRes = await _websiteClient.WebHostingPlans.CreateOrUpdateAsync(rgName, whpCreateParams);
-
+            // Create/Update the Website
             var createParams = new WebSiteCreateOrUpdateParameters
             {
                 WebSite = new WebSiteBase
@@ -111,9 +117,9 @@ namespace ManagementLibrarySample
                     }
                 }
             };
+            var siteCreateResult = await _websiteClient.WebSites.CreateOrUpdateAsync(rgName, siteName, null /*slot*/, createParams);
 
-            var siteCreateRes = await _websiteClient.WebSites.CreateOrUpdateAsync(rgName, siteName, null /*slot*/, createParams);
-
+            // Create/Update the Website configuration
             var siteUpdateParams = new WebSiteUpdateConfigurationParameters
             {
                 Location = location,
@@ -122,8 +128,7 @@ namespace ManagementLibrarySample
                     PhpVersion = "5.6",
                 }
             };
-
-            var updateRes = await _websiteClient.WebSites.UpdateConfigurationAsync(rgName, siteName, null /*slot*/, siteUpdateParams);
+            var siteUpdateRes = await _websiteClient.WebSites.UpdateConfigurationAsync(rgName, siteName, null /*slot*/, siteUpdateParams);
         }
     }
 }
