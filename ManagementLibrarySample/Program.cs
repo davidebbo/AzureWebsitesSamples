@@ -23,7 +23,7 @@ namespace ManagementLibrarySample
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e.GetBaseException().Message);
             }
         }
 
@@ -38,7 +38,8 @@ namespace ManagementLibrarySample
 
             await ListResourceGroupsAndSites();
 
-            await CreateSite("MyResourceGroup", "MyWebHostingPlan", "MySite777", "West US");
+            // Note: site names are globally unique, so you may need to change it to avoid conflicts
+            await CreateSite("MyResourceGroup", "MyWebHostingPlan", "SampleSiteFromAPI", "West US");
         }
 
         private static SubscriptionCloudCredentials GetCredsFromServicePrincipal()
