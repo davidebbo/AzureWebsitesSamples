@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -129,6 +130,30 @@ namespace ManagementLibrarySample
                 }
             };
             var siteUpdateRes = await _websiteClient.WebSites.UpdateConfigurationAsync(rgName, siteName, null /*slot*/, siteUpdateParams);
+
+            // Create/Update some App Settings
+            var appSettingsParams = new WebSiteNameValueParameters
+            {
+                Location = location,
+                Properties = new List<NameValuePair>
+                {
+                    new NameValuePair { Name = "MyFirstKey", Value = "My first value"},
+                    new NameValuePair { Name = "MySecondKey", Value = "My second value"}
+                }
+            };
+            var appSettingsRes = await _websiteClient.WebSites.UpdateAppSettingsAsync(rgName, siteName, null /*slot*/, appSettingsParams);
+
+            // Create/Update some Connection Strings
+            var connStringsParams = new WebSiteUpdateConnectionStringsParameters
+            {
+                Location = location,
+                Properties = new List<ConnectionStringInfo>
+                {
+                    new ConnectionStringInfo { Name = "MyFirstConnString", ConnectionString = "My SQL conn string", Type = DatabaseServerType.SQLAzure},
+                    new ConnectionStringInfo { Name = "MySecondConnString", ConnectionString = "My custom conn string", Type = DatabaseServerType.Custom}
+                }
+            };
+            var connStringsRes = await _websiteClient.WebSites.UpdateConnectionStringsAsync(rgName, siteName, null /*slot*/, connStringsParams);
         }
     }
 }
