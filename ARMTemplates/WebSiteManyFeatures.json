@@ -53,7 +53,7 @@
         "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
       ],
       "properties": {
-        "webHostingPlan": "[parameters('hostingPlanName')]"
+        "serverFarm": "[parameters('hostingPlanName')]"
       },
       "resources": [
         {

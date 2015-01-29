@@ -27,7 +27,7 @@
       "location": "[parameters('siteLocation')]",
       "dependsOn": [ "[parameters('hostingPlanName')]" ],
       "properties": {
-        "webHostingPlan": "[parameters('hostingPlanName')]"
+        "serverFarm": "[parameters('hostingPlanName')]"
       },
       "resources": [
         {
