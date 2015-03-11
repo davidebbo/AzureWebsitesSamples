@@ -113,13 +113,8 @@
             "startTime":"2015-02-10T00:08:00Z",
             "action":{
               "request":{
-                "uri":"[concat('https://',reference(resourceId('Microsoft.Web/Sites',parameters('siteName'))).enabledHostNames[1],'/api/triggeredjobs/MyScheduledWebJob/run')]",
-                "method":"POST",
-                "authentication":{
-                  "type":"Basic",
-                  "username":"[list(resourceId('Microsoft.Web/sites/config', parameters('siteName'), 'publishingcredentials'), '2014-06-01').properties.publishingUserName]",
-                  "password":"[list(resourceId('Microsoft.Web/sites/config', parameters('siteName'), 'publishingcredentials'), '2014-06-01').properties.publishingPassword]"
-                }
+                "uri":"[concat(list(resourceId('Microsoft.Web/sites/config', parameters('siteName'), 'publishingcredentials'), '2014-06-01').properties.scmUri, '/api/triggeredjobs/MyScheduledWebJob/run')]",
+                "method":"POST"
               },
               "type":"http",
               "retryPolicy":{
