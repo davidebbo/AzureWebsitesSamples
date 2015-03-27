@@ -74,6 +74,16 @@ Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
     SetSiteConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion }
 }
 
+## Deployment related operations
+
+# Example call: DeployCloudHostedPackage MyResourceGroup "West US" MySite https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
+Function DeployCloudHostedPackage($ResourceGroupName, $Location, $SiteName, $packageUrl)
+{
+    New-AzureResource –ResourceGroupName $ResourceGroupName -Location $Location –ResourceType Microsoft.Web/sites/Extensions –Name MSDeploy –ParentResource sites/$SiteName -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion 2014-04-01 -Force
+}
+
+
+
 
 ## Certificate operations
 
