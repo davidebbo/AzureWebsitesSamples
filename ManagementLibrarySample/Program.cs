@@ -88,7 +88,7 @@ namespace ManagementLibrarySample
         static async Task CreateSite(string rgName, string whpName, string siteName, string location)
         {
             // Create/Update the resource group
-            var rgCreateResult = await _resourceGroupClient.ResourceGroups.CreateOrUpdateAsync(rgName, new BasicResourceGroup { Location = location });
+            var rgCreateResult = await _resourceGroupClient.ResourceGroups.CreateOrUpdateAsync(rgName, new ResourceGroup { Location = location });
 
             // Create/Update the Web Hosting Plan
             var whpCreateParams = new WebHostingPlanCreateOrUpdateParameters
