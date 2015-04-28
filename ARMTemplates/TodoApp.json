@@ -255,7 +255,7 @@
             "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]",
           ],
           "properties": {
-            "appSettingNames": [ "apiPath", "PROJECT", "SCM_POST_DEPLOYMENT_ACTIONS_PATH" ]
+            "appSettingNames": [ "apiPath", "PROJECT" ]
           }
         },
         {
@@ -278,8 +278,7 @@
               ],
               "properties": {
                 "apiPath": "[concat('http://', variables('apiSiteName'), '-staging.azurewebsites.net/api')]",
-                "PROJECT": "src\\MultiChannelToDo.Web\\app",
-                "SCM_POST_DEPLOYMENT_ACTIONS_PATH": "d:\\home\\site\\wwwroot\\bin"
+                "PROJECT": "src\\MultiChannelToDo.Web\\app"
               }
             },
             {
