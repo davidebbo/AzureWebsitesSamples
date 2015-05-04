@@ -11,16 +11,6 @@
     "siteLocation":{
       "type":"string"
     },
-    "sku":{
-      "type":"string",
-      "allowedValues":[
-        "Free",
-        "Shared",
-        "Basic",
-        "Standard"
-      ],
-      "defaultValue":"Free"
-    },
     "workerSize":{
       "type":"string",
       "allowedValues":[
@@ -38,9 +28,6 @@
       "defaultValue":"master"
     },
     "sqlServerName":{
-      "type":"string"
-    },
-    "sqlServerLocation":{
       "type":"string"
     },
     "sqlServerAdminLogin":{
@@ -68,6 +55,9 @@
     "sqlDbServiceObjectiveId":{
       "type":"string",
       "defaultValue":"910b4fcb-8a29-4c3e-958f-f7ba794388b2"
+    },
+    "jobCollectionName":{
+      "type":"string"
     }
   },
   "variables":{
@@ -78,7 +68,7 @@
       "apiVersion":"2014-04-01-preview",
       "name":"[parameters('sqlServerName')]",
       "type":"Microsoft.Sql/servers",
-      "location":"[parameters('sqlServerLocation')]",
+      "location":"[parameters('siteLocation')]",
       "properties":{
         "administratorLogin":"[parameters('sqlServerAdminLogin')]",
         "administratorLoginPassword":"[parameters('sqlServerAdminPassword')]"
@@ -88,7 +78,7 @@
           "apiVersion":"2014-11-01",
           "name":"[parameters('sqlDbName')]",
           "type":"databases",
-          "location":"[parameters('sqlServerLocation')]",
+          "location":"[parameters('siteLocation')]",
           "dependsOn":[
             "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
           ],
@@ -103,7 +93,7 @@
           "apiVersion":"2014-11-01",
           "name":"SQLServerFirewallRules",
           "type":"firewallrules",
-          "location":"[parameters('sqlServerLocation')]",
+          "location":"[parameters('siteLocation')]",
           "dependsOn":[
             "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
           ],
@@ -121,7 +111,7 @@
       "location":"[parameters('siteLocation')]",
       "properties":{
         "name":"[parameters('hostingPlanName')]",
-        "sku":"[parameters('sku')]",
+        "sku":"Standard",
         "workerSize":"[parameters('workerSize')]",
         "numberOfWorkers":1
       }
@@ -146,7 +136,7 @@
             "[resourceId('Microsoft.Web/Sites', variables('apiSiteName'))]",
           ],
           "properties": {
-            "clientUrl": "[concat('http://', parameters('siteName'), '.azurewebsites.net')]"
+            "clientUrl": "[concat('http://', reference(resourceId('Microsoft.Web/Sites', parameters('siteName'))).hostNames[0])]"
           }
         },
         {
@@ -192,7 +182,7 @@
               ],
               "properties": {
                 "PROJECT": "src\\MultiChannelToDo\\MultiChannelToDo.csproj",
-                "clientUrl": "[concat('http://', parameters('siteName'), '-staging.azurewebsites.net')]"
+                "clientUrl": "[concat('http://', reference(resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), 'Staging')).hostNames[0])]"
               }
             },
             {
@@ -244,7 +234,7 @@
             "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]",
           ],
           "properties": {
-            "apiPath": "[concat('http://', variables('apiSiteName'), '.azurewebsites.net/api')]",
+            "apiPath": "[concat('http://', reference(resourceId('Microsoft.Web/Sites', variables('apiSiteName'))).hostNames[0], '/api')]"
           }
         },
         {
@@ -277,7 +267,7 @@
                 "[resourceId('Microsoft.Web/Sites/slots', parameters('siteName'), 'Staging')]",
               ],
               "properties": {
-                "apiPath": "[concat('http://', variables('apiSiteName'), '-staging.azurewebsites.net/api')]",
+                "apiPath": "[concat('http://', reference(resourceId('Microsoft.Web/Sites/Slots', variables('apiSiteName'), 'Staging')).hostNames[0], '/api')]",
                 "PROJECT": "src\\MultiChannelToDo.Web\\app"
               }
             },
@@ -295,6 +285,57 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "apiVersion":"2014-08-01-preview",
+      "name":"[parameters('jobCollectionName')]",
+      "type":"Microsoft.Scheduler/jobCollections",
+      "dependsOn":[
+        "[resourceId('Microsoft.Web/Sites', variables('apiSiteName'))]",
+      ],
+      "location":"[parameters('siteLocation')]",
+      "properties":{
+        "sku":{
+          "name":"standard"
+        },
+        "quota":{
+          "maxJobCount":"10",
+          "maxRecurrence":{
+            "Frequency":"minute",
+            "interval":"1"
+          }
+        }
+      },
+      "resources":[
+        {
+          "apiVersion":"2014-08-01-preview",
+          "name":"HelloJob",
+          "type":"jobs",
+          "dependsOn":[
+            "[resourceId('Microsoft.Scheduler/jobCollections', parameters('jobCollectionName'))]"
+          ],
+          "properties":{
+            "startTime":"2015-02-10T00:08:00Z",
+            "action":{
+              "request":{
+                "uri":"[concat(list(resourceId('Microsoft.Web/sites/config', variables('apiSiteName'), 'publishingcredentials'), '2014-06-01').properties.scmUri, '/api/triggeredwebjobs/HelloJob/run')]",
+                "method":"POST"
+              },
+              "type":"http",
+              "retryPolicy":{
+                "retryType":"Fixed",
+                "retryInterval":"PT1M",
+                "retryCount":2
+              }
+            },
+            "state":"enabled",
+            "recurrence":{
+              "frequency":"minute",
+              "interval":1
+            }
+          }
         }
       ]
     }
