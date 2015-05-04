@@ -1,0 +1,29 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters":{
+    "siteName":{ "type":"string" }
+  },
+  "resources": [
+    {
+      "apiVersion": "2014-11-01",
+      "name": "DemoAppServicePlan",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "West US",
+      "properties":
+      {
+        "sku": "Free",
+      }
+    },
+    {
+      "apiVersion": "2014-11-01",
+      "name": "[parameters('siteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "West US",
+      "dependsOn": [ "DemoAppServicePlan" ],
+      "properties": {
+        "serverFarm": "DemoAppServicePlan"
+      }
+    }
+  ]
+}
