@@ -1,16 +1,29 @@
 ## WebHostingPlan operations
 
-# Example call: ListWebHostingPlans MyResourceGroup
-Function ListWebHostingPlans($ResourceGroupName)
+# Example call: ListAppServicePlans MyResourceGroup
+Function ListAppServicePlans($ResourceGroupName)
 {
     Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -OutputObjectFormat New
 }
 
-# Example call: GetWebHostingPlan MyResourceGroup MyWHP
-Function GetWebHostingPlan($ResourceGroupName, $PlanName)
+# Example call: GetAppServicePlan MyResourceGroup MyWHP
+Function GetAppServicePlan($ResourceGroupName, $PlanName)
 {
     Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -OutputObjectFormat New -ApiVersion 2015-04-01
 }
+
+# Example call: CreateAppServicePlan MyResourceGroup "North Europe" MyHostingPlan
+Function CreateAppServicePlan($ResourceGroupName, $Location, $PlanName, $Sku = "Free")
+{
+    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/serverfarms -Name $PlanName -PropertyObject @{ sku = $Sku } -OutputObjectFormat New -ApiVersion 2015-04-01 -Force
+}
+
+# Example call: DeleteSite MyResourceGroup MySite
+Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
+{
+    Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -ApiVersion 2015-04-01 -Force
+}
+
 
 
 ## Site operations
@@ -30,7 +43,7 @@ Function GetSite($ResourceGroupName, $SiteName)
 # Example call: CreateSite MyResourceGroup "North Europe" MySite DefaultServerFarm
 Function CreateSite($ResourceGroupName, $Location, $SiteName, $PlanName)
 {
-    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject @{ "webHostingPlan" = $PlanName } -OutputObjectFormat New -ApiVersion 2015-04-01 -Force
+    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject @{ webHostingPlan = $PlanName } -OutputObjectFormat New -ApiVersion 2015-04-01 -Force
 }
 
 # Example call: DeleteSite MyResourceGroup MySite
@@ -138,3 +151,26 @@ Function DeleteCert($ResourceGroupName, $CertName)
 {
     Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -ApiVersion 2014-11-01 -Force
 }
+
+
+## Tests
+
+Function TestHelpers($ResourceGroupName, $Location, $SiteName, $PlanName = "MyPlan")
+{
+    CreateAppServicePlan $ResourceGroupName $Location $PlanName
+
+    ListAppServicePlans $ResourceGroupName
+
+    GetAppServicePlan $ResourceGroupName $PlanName
+
+    CreateSite $ResourceGroupName $Location $SiteName $PlanName
+
+    ListSites $ResourceGroupName
+
+    $site = GetSite $ResourceGroupName $SiteName
+    Write-Host $site.Properties.enabledHostNames[0]
+
+    DeleteAppServicePlan $ResourceGroupName $PlanName
+}
+
+
