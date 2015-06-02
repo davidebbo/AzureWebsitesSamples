@@ -18,7 +18,7 @@ Function CreateAppServicePlan($ResourceGroupName, $Location, $PlanName, $Sku = "
     New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/serverfarms -Name $PlanName -PropertyObject @{ sku = $Sku } -OutputObjectFormat New -ApiVersion 2015-04-01 -Force
 }
 
-# Example call: DeleteSite MyResourceGroup MySite
+# Example call: DeleteWebApp MyResourceGroup MySite
 Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
 {
     Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -ApiVersion 2015-04-01 -Force
@@ -28,26 +28,26 @@ Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
 
 ## Site operations
 
-# Example call: ListSites MyResourceGroup
-Function ListSites($ResourceGroupName)
+# Example call: ListWebApps MyResourceGroup
+Function ListWebApps($ResourceGroupName)
 {
     Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -OutputObjectFormat New
 }
 
-# Example call: GetSite MyResourceGroup MySite
-Function GetSite($ResourceGroupName, $SiteName)
+# Example call: GetWebApp MyResourceGroup MySite
+Function GetWebApp($ResourceGroupName, $SiteName)
 {
     Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -OutputObjectFormat New -ApiVersion 2015-04-01
 }
 
-# Example call: CreateSite MyResourceGroup "North Europe" MySite DefaultServerFarm
-Function CreateSite($ResourceGroupName, $Location, $SiteName, $PlanName)
+# Example call: CreateWebApp MyResourceGroup "North Europe" MySite DefaultServerFarm
+Function CreateWebApp($ResourceGroupName, $Location, $SiteName, $PlanName)
 {
     New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject @{ webHostingPlan = $PlanName } -OutputObjectFormat New -ApiVersion 2015-04-01 -Force
 }
 
-# Example call: DeleteSite MyResourceGroup MySite
-Function DeleteSite($ResourceGroupName, $SiteName)
+# Example call: DeleteWebApp MyResourceGroup MySite
+Function DeleteWebApp($ResourceGroupName, $SiteName)
 {
     Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -ApiVersion 2015-04-01 -Force
 }
@@ -55,21 +55,21 @@ Function DeleteSite($ResourceGroupName, $SiteName)
 # Example call: $planId = GetSiteAppServicePlanId MyResourceGroup MySite
 Function GetSiteAppServicePlanId($ResourceGroupName, $SiteName)
 {
-    $site = GetSite $ResourceGroupName $SiteName
+    $site = GetWebApp $ResourceGroupName $SiteName
     $site.Properties.serverFarmId
 }
 
 
 ## Site config operations
 
-# Example call: GetSiteConfig MyResourceGroup MySite
-Function GetSiteConfig($ResourceGroupName, $SiteName)
+# Example call: GetWebAppConfig MyResourceGroup MySite
+Function GetWebAppConfig($ResourceGroupName, $SiteName)
 {
     Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -OutputObjectFormat New -ApiVersion 2015-04-01
 }
 
-# Example call: SetSiteConfig MyResourceGroup MySite $ConfigObject
-Function SetSiteConfig($ResourceGroupName, $SiteName, $ConfigObject)
+# Example call: SetWebAppConfig MyResourceGroup MySite $ConfigObject
+Function SetWebAppConfig($ResourceGroupName, $SiteName, $ConfigObject)
 {
     Set-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -PropertyObject $ConfigObject -OutputObjectFormat New -ApiVersion 2015-04-01 -Force
 }
@@ -77,14 +77,14 @@ Function SetSiteConfig($ResourceGroupName, $SiteName, $ConfigObject)
 # Example call: $phpVersion = GetPHPVersion MyResourceGroup MySite
 Function GetPHPVersion($ResourceGroupName, $SiteName)
 {
-    $config = GetSiteConfig $ResourceGroupName $SiteName
+    $config = GetWebAppConfig $ResourceGroupName $SiteName
     $config.Properties.phpVersion
 }
 
 # Example call: SetPHPVersion MyResourceGroup MySite 5.6
 Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
 {
-    SetSiteConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion }
+    SetWebAppConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion }
 }
 
 
@@ -163,12 +163,24 @@ Function TestHelpers($ResourceGroupName, $Location, $SiteName, $PlanName = "MyPl
 
     GetAppServicePlan $ResourceGroupName $PlanName
 
-    CreateSite $ResourceGroupName $Location $SiteName $PlanName
+    CreateWebApp $ResourceGroupName $Location $SiteName $PlanName
 
-    ListSites $ResourceGroupName
+    ListWebApps $ResourceGroupName
 
-    $site = GetSite $ResourceGroupName $SiteName
-    Write-Host $site.Properties.enabledHostNames[0]
+    $site = GetWebApp $ResourceGroupName $SiteName
+    $hostName = $site.Properties.enabledHostNames[0]
+    $response = Invoke-WebRequest $hostName
+    Write-Host $response.StatusCode
+
+    SetSiteAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2" }
+
+    GetSiteAppSettings $ResourceGroupName $SiteName
+
+    GetPHPVersion $ResourceGroupName $SiteName
+    SetPHPVersion $ResourceGroupName $SiteName 5.6
+    GetPHPVersion $ResourceGroupName $SiteName
+
+    DeleteWebApp $ResourceGroupName $SiteName
 
     DeleteAppServicePlan $ResourceGroupName $PlanName
 }
