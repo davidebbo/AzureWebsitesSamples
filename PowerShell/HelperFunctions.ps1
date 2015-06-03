@@ -92,15 +92,15 @@ Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
 
 ## App Settings
 
-# Example call: GetSiteAppSettings MyResourceGroup MySite
-Function GetSiteAppSettings($ResourceGroupName, $SiteName)
+# Example call: GetWebAppAppSettings MyResourceGroup MySite
+Function GetWebAppAppSettings($ResourceGroupName, $SiteName)
 {
     $res = Invoke-AzureResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/appsettings -Action list -ApiVersion 2015-06-01 -Force
     $res.Properties
 }
 
-# Example call: SetSiteAppSettings MyResourceGroup MySite @{ key1 = "val1"; key2 = "val2" }
-Function SetSiteAppSettings($ResourceGroupName, $SiteName, $AppSettingsObject)
+# Example call: SetWebAppAppSettings MyResourceGroup MySite @{ key1 = "val1"; key2 = "val2" }
+Function SetWebAppAppSettings($ResourceGroupName, $SiteName, $AppSettingsObject)
 {
     New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/appsettings -PropertyObject $AppSettingsObject -OutputObjectFormat New -ApiVersion 2015-06-01 -Force
 }
@@ -108,16 +108,16 @@ Function SetSiteAppSettings($ResourceGroupName, $SiteName, $AppSettingsObject)
 
 ## Connection Strings
 
-# Example call: GetSiteConnectionStrings MyResourceGroup MySite
-Function GetSiteConnectionStrings($ResourceGroupName, $SiteName)
+# Example call: GetWebAppConnectionStrings MyResourceGroup MySite
+Function GetWebAppConnectionStrings($ResourceGroupName, $SiteName)
 {
     $res = Invoke-AzureResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -Action list -ApiVersion 2015-06-01 -Force
     $res.Properties
 }
 
-# Example call: SetSiteConnectionStrings MyResourceGroup MySite @{ conn1 = { Value = "Some connection string"; Type = 2  } }
+# Example call: SetWebAppConnectionStrings MyResourceGroup MySite @{ conn1 = { Value = "Some connection string"; Type = 2  } }
 # NOTE: broken, need to fix!
-Function SetSiteConnectionStrings($ResourceGroupName, $SiteName, $ConnectionStringsObject)
+Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionStringsObject)
 {
     New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -PropertyObject $ConnectionStringsObject -OutputObjectFormat New -ApiVersion 2015-06-01 -Force
 }
@@ -174,9 +174,9 @@ Function TestHelpers($ResourceGroupName, $Location, $SiteName, $PlanName = "MyPl
     $response = Invoke-WebRequest $hostName
     Write-Host $response.StatusCode
 
-    SetSiteAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2" }
+    SetWebAppAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2" }
 
-    GetSiteAppSettings $ResourceGroupName $SiteName
+    GetWebAppAppSettings $ResourceGroupName $SiteName
 
     GetPHPVersion $ResourceGroupName $SiteName
     SetPHPVersion $ResourceGroupName $SiteName 5.6
