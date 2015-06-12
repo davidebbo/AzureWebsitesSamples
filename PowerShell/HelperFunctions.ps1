@@ -155,10 +155,36 @@ Function DeleteCert($ResourceGroupName, $CertName)
 }
 
 
+## Premium Add-Ons
+
+Function GetWebAppAddons($ResourceGroupName, $SiteName)
+{
+    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName -OutputObjectFormat New -ApiVersion 2015-06-01 -IsCollection
+}
+
+Function AddZrayAddon($ResourceGroupName, $Location, $SiteName, $Name, $PlanName)
+{
+    $plan = @{
+        name = $PlanName
+        publisher = "zend-technologies"
+        product = "z-ray"
+    }
+
+    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -Properties @{} -PlanObject $plan -OutputObjectFormat New -ApiVersion 2015-06-01 -Force
+}
+
+Function RemoveWebAppAddon($ResourceGroupName, $SiteName, $Name)
+{
+    Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -ApiVersion 2015-06-01 -Force
+}
+
+
+
 ## Tests
 
 Function TestHelpers($ResourceGroupName, $Location, $SiteName, $PlanName = "MyPlan")
 {
+    New-AzureResourceGroup -Name $ResourceGroupName -Location $Location -Force
     CreateAppServicePlan $ResourceGroupName $Location $PlanName
 
     ListAppServicePlans $ResourceGroupName
@@ -181,6 +207,10 @@ Function TestHelpers($ResourceGroupName, $Location, $SiteName, $PlanName = "MyPl
     GetPHPVersion $ResourceGroupName $SiteName
     SetPHPVersion $ResourceGroupName $SiteName 5.6
     GetPHPVersion $ResourceGroupName $SiteName
+
+    AddZrayAddon $ResourceGroupName $Location $SiteName MyZray "free"
+    GetWebAppAddons $ResourceGroupName $SiteName
+    RemoveWebAppAddon $ResourceGroupName $SiteName MyZray
 
     DeleteWebApp $ResourceGroupName $SiteName
 
