@@ -52,6 +52,16 @@ SetWebAppAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2
 Write-Host "Reading the app settings"
 GetWebAppAppSettings $ResourceGroupName $SiteName
 
+Write-Host "Setting some connnection strings"
+$props=@{
+    MyConn = @{ Value = "Some connection string"; Type = "SqlAzure"  }
+    MyConn2 = @{ Value = "Some other connection string"; Type = "Custom"  }
+}
+SetWebAppConnectionStrings $ResourceGroupName $SiteName $props
+
+Write-Host "Reading the connection strings"
+GetWebAppConnectionStrings $ResourceGroupName $SiteName
+
 Write-Host "Setting the PHP version and reading it back"
 SetPHPVersion $ResourceGroupName $SiteName 5.6
 GetPHPVersion $ResourceGroupName $SiteName

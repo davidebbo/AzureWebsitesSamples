@@ -115,8 +115,7 @@ Function GetWebAppConnectionStrings($ResourceGroupName, $SiteName)
     $res.Properties
 }
 
-# Example call: SetWebAppConnectionStrings MyResourceGroup MySite @{ conn1 = { Value = "Some connection string"; Type = 2  } }
-# NOTE: broken, need to fix!
+# Example call: SetWebAppConnectionStrings MyResourceGroup MySite @{ conn1 = @{ Value = "Some connection string"; Type = 2  } }
 Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionStringsObject)
 {
     New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -PropertyObject $ConnectionStringsObject -OutputObjectFormat New -ApiVersion 2015-06-01 -Force
