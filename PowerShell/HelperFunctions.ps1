@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 # Example call: ListAppServicePlans MyResourceGroup
 Function ListAppServicePlans($ResourceGroupName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -OutputObjectFormat New
+    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -OutputObjectFormat New -IsCollection
 }
 
 # Example call: GetAppServicePlan MyResourceGroup MyWHP
@@ -131,6 +131,24 @@ Function DeployCloudHostedPackage($ResourceGroupName, $Location, $SiteName, $pac
     New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/Extensions -Name MSDeploy -ParentResource sites/$SiteName -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion 2014-04-01 -Force
 }
 
+# Deploy from an external git repo
+Function HookupExternalGitRepo($ResourceGroupName, $SiteName, $repoUrl)
+{
+    $props = @{
+        RepoUrl = $repoUrl
+        Branch = "master"
+        IsManualIntegration = true
+    }
+
+    New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/SourceControls -Name $SiteName/Web -PropertyObject $props -OutputObjectFormat New -ApiVersion 2015-06-01 -Force
+}
+
+# Deploy from an external git repo
+Function GetGitDeployments($ResourceGroupName, $SiteName)
+{
+    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Deployments -Name $SiteName -OutputObjectFormat New -ApiVersion 2015-06-01
+}
+
 
 ## Certificate operations
 
@@ -176,60 +194,4 @@ Function AddZrayAddon($ResourceGroupName, $Location, $SiteName, $Name, $PlanName
 Function RemoveWebAppAddon($ResourceGroupName, $SiteName, $Name)
 {
     Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -ApiVersion 2015-06-01 -Force
-}
-
-
-
-## Tests
-
-Function TestHelpers($ResourceGroupName, $Location, $SiteName, $PlanName = "MyPlan")
-{
-    Write-Host "Creating Resource Group"
-    New-AzureResourceGroup -Name $ResourceGroupName -Location $Location -Force
-
-    Write-Host "Creating App Service Plan"
-    CreateAppServicePlan $ResourceGroupName $Location $PlanName
-
-    Write-Host "Listing App Service Plans"
-    ListAppServicePlans $ResourceGroupName
-
-    Write-Host "Getting a specific App Service Plan"
-    GetAppServicePlan $ResourceGroupName $PlanName
-
-    Write-Host "Creating Web App"
-    CreateWebApp $ResourceGroupName $Location $SiteName $PlanName
-
-    Write-Host "Listing all Web Apps in the Resource Group"
-    ListWebApps $ResourceGroupName
-
-    Write-Host "Getting a specific Wep App and sending a GET request to its hostname"
-    $site = GetWebApp $ResourceGroupName $SiteName
-    $hostName = $site.Properties.enabledHostNames[0]
-    $response = Invoke-WebRequest $hostName
-    Write-Host $response.StatusCode
-
-    Write-Host "Setting some app settings"
-    SetWebAppAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2" }
-
-    Write-Host "Reading the app settings"
-    GetWebAppAppSettings $ResourceGroupName $SiteName
-
-    Write-Host "Setting the PHP version and reading it back"
-    SetPHPVersion $ResourceGroupName $SiteName 5.6
-    GetPHPVersion $ResourceGroupName $SiteName
-
-    Write-Host "Enabling the ZRay addon"
-    AddZrayAddon $ResourceGroupName $Location $SiteName MyZray "free"
-
-    Write-Host "Listing installed addons"
-    GetWebAppAddons $ResourceGroupName $SiteName
-
-    Write-Host "Removing the ZRay addon"
-    RemoveWebAppAddon $ResourceGroupName $SiteName MyZray
-
-    Write-Host "Deleting the Web App"
-    DeleteWebApp $ResourceGroupName $SiteName
-
-    Write-Host "Deleting the App Servce Plan"
-    DeleteAppServicePlan $ResourceGroupName $PlanName
 }
