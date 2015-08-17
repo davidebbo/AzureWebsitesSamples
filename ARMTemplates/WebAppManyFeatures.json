@@ -11,16 +11,6 @@
     "siteLocation": {
       "type": "string"
     },
-    "sku": {
-      "type": "string",
-      "allowedValues": [
-        "Free",
-        "Shared",
-        "Basic",
-        "Standard"
-      ],
-      "defaultValue": "Free"
-    },
     "workerSize": {
       "type": "string",
       "allowedValues": [
@@ -33,19 +23,21 @@
   },
   "resources": [
     {
-      "apiVersion": "2015-04-01",
+      "apiVersion": "2015-08-01",
       "name": "[parameters('appServicePlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('siteLocation')]",
+      "sku": {
+        "name": "S1",
+        "tier": "Standard",
+        "capacity": 1
+      },
       "properties": {
-        "name": "[parameters('appServicePlanName')]",
-        "sku": "[parameters('sku')]",
-        "workerSize": "[parameters('workerSize')]",
-        "numberOfWorkers": 1
+        "name": "[parameters('appServicePlanName')]"
       }
     },
     {
-      "apiVersion": "2015-06-01",
+      "apiVersion": "2015-08-01",
       "name": "[parameters('siteName')]",
       "type": "Microsoft.Web/sites",
       "location": "[parameters('siteLocation')]",
@@ -57,7 +49,7 @@
       },
       "resources": [
         {
-          "apiVersion": "2015-06-01",
+          "apiVersion": "2015-08-01",
           "name": "web",
           "type": "config",
           "dependsOn": [
@@ -94,7 +86,7 @@
           }
         },
         {
-          "apiVersion": "2015-06-01",
+          "apiVersion": "2015-08-01",
           "name": "appsettings",
           "type": "config",
           "dependsOn": [
@@ -107,7 +99,7 @@
           }
         },
         {
-          "apiVersion": "2015-06-01",
+          "apiVersion": "2015-08-01",
           "name": "connectionstrings",
           "type": "config",
           "dependsOn": [
@@ -119,7 +111,7 @@
           }
         },
         {
-          "apiVersion": "2015-06-01",
+          "apiVersion": "2015-08-01",
           "name": "slotconfignames",
           "type": "config",
           "dependsOn": [
@@ -131,7 +123,7 @@
           }
         },
         {
-          "apiVersion": "2015-06-01",
+          "apiVersion": "2015-08-01",
           "name": "Staging",
           "type": "slots",
           "location": "[parameters('siteLocation')]",
@@ -142,7 +134,7 @@
           },
           "resources": [
             {
-              "apiVersion": "2015-06-01",
+              "apiVersion": "2015-08-01",
               "name": "appsettings",
               "type": "config",
               "dependsOn": [
