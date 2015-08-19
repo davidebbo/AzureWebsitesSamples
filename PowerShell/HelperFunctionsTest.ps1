@@ -1,4 +1,4 @@
-$ResourceGroupName = "TestRG2"
+$ResourceGroupName = "TestRG"
 $Location = "East US 2"
 $SiteName = "PSTest7775"
 $PlanName = "MyPlan"
