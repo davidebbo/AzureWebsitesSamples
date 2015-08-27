@@ -124,18 +124,24 @@ namespace ManagementLibrarySample
             siteConfig = await _websiteClient.Sites.CreateOrUpdateSiteConfigAsync(rgName, siteName, siteConfig);
 
             // Create/Update some App Settings
-            var appSettings = new Dictionary<string, string>
+            var appSettings = new StringDictionary
             {
-                { "MyFirstKey", "My first value" },
-                { "MySecondKey", "My second value" }
+                Properties = new Dictionary<string, string>
+                {
+                    { "MyFirstKey", "My first value" },
+                    { "MySecondKey", "My second value" }
+                }
             };
             await _websiteClient.Sites.UpdateSiteAppSettingsAsync(rgName, siteName, appSettings);
 
             // Create/Update some Connection Strings
-            var connStrings = new Dictionary<string, ConnStringValueTypePair>
+            var connStrings = new ConnectionStringDictionary
             {
-                { "MyFirstConnString", new ConnStringValueTypePair { Value="My SQL conn string", Type="SQLAzure" }},
-                { "MySecondConnString", new ConnStringValueTypePair { Value="My custom conn string", Type="Custom" }}
+                Properties = new Dictionary<string, ConnStringValueTypePair>
+                {
+                    { "MyFirstConnString", new ConnStringValueTypePair { Value = "My SQL conn string", Type = "SQLAzure" }},
+                    { "MySecondConnString", new ConnStringValueTypePair { Value = "My custom conn string", Type = "Custom" }}
+                }
             };
             await _websiteClient.Sites.UpdateSiteConnectionStringsAsync(rgName, siteName, connStrings);
         }
