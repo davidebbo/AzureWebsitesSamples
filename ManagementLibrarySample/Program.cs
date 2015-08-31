@@ -131,6 +131,13 @@ namespace ManagementLibrarySample
             };
             var siteUpdateRes = await _websiteClient.WebSites.UpdateConfigurationAsync(rgName, siteName, null /*slot*/, siteUpdateParams);
 
+            // List current App Settings
+            var appSettingsRes = await _websiteClient.WebSites.GetAppSettingsAsync(rgName, siteName, null /*slot*/);
+            foreach (var appSetting in appSettingsRes.Resource.Properties)
+            {
+                Console.WriteLine("{0} = {1}", appSetting.Name, appSetting.Value);
+            }
+
             // Create/Update some App Settings
             var appSettingsParams = new WebSiteNameValueParameters
             {
@@ -141,7 +148,7 @@ namespace ManagementLibrarySample
                     new NameValuePair { Name = "MySecondKey", Value = "My second value"}
                 }
             };
-            var appSettingsRes = await _websiteClient.WebSites.UpdateAppSettingsAsync(rgName, siteName, null /*slot*/, appSettingsParams);
+            appSettingsRes = await _websiteClient.WebSites.UpdateAppSettingsAsync(rgName, siteName, null /*slot*/, appSettingsParams);
 
             // Create/Update some Connection Strings
             var connStringsParams = new WebSiteUpdateConnectionStringsParameters
