@@ -135,7 +135,7 @@ Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionSt
 # Example call: DeployCloudHostedPackage MyResourceGroup "West US" MySite https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 Function DeployCloudHostedPackage($ResourceGroupName, $Location, $SiteName, $packageUrl)
 {
-    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/Extensions -Name MSDeploy -ParentResource sites/$SiteName -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion 2015-08-01 -Force
+    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/Extensions -Name $SiteName/MSDeploy -PropertyObject @{ "packageUri" = $packageUrl } -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
 }
 
 # Deploy from an external git repo

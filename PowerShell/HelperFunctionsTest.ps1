@@ -66,6 +66,9 @@ Write-Host "Setting the PHP version and reading it back"
 SetPHPVersion $ResourceGroupName $SiteName 5.6
 GetPHPVersion $ResourceGroupName $SiteName
 
+Write-Host "Deploying bakery sample using msdeploy"
+DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
+
 Write-Host "Enabling the ZRay addon"
 AddZrayAddon $ResourceGroupName $Location $SiteName MyZray "free"
 
