@@ -9,6 +9,7 @@ using Microsoft.Azure.Management.Resources.Models;
 using Microsoft.Azure.Management.WebSites;
 using Microsoft.Azure.Management.WebSites.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Rest;
 
 namespace ManagementLibrarySample
 {
@@ -32,22 +33,27 @@ namespace ManagementLibrarySample
         static async Task MainAsync()
         {
             // Get the credentials
-            SubscriptionCloudCredentials cloudCreds = GetCredsFromServicePrincipal();
+            TokenCloudCredentials cloudCreds = GetCredsFromServicePrincipal();
+
+            var tokenCreds = new TokenCredentials(cloudCreds.Token);
+
+            var loggingHandler = new LoggingHandler(new HttpClientHandler());
 
             // Create our own HttpClient so we can do logging
-            HttpClient httpClient = new HttpClient(new LoggingHandler(new HttpClientHandler()));
+            var httpClient = new HttpClient(loggingHandler);
 
             // Use the creds to create the clients we need
             _resourceGroupClient = new ResourceManagementClient(cloudCreds, httpClient);
-            _websiteClient = new WebSiteManagementClient(cloudCreds, httpClient);
+            _websiteClient = new WebSiteManagementClient(tokenCreds, loggingHandler);
+            _websiteClient.SubscriptionId = cloudCreds.SubscriptionId;
 
             await ListResourceGroupsAndSites();
 
             // Note: site names are globally unique, so you may need to change it to avoid conflicts
-            await CreateSite("MyResourceGroup", "MyWebHostingPlan", "SampleSiteFromAPI", "West US");
+            await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI", "West US");
         }
 
-        private static SubscriptionCloudCredentials GetCredsFromServicePrincipal()
+        private static TokenCloudCredentials GetCredsFromServicePrincipal()
         {
             string subscription = ConfigurationManager.AppSettings["AzureSubscription"];
             string tenantId = ConfigurationManager.AppSettings["AzureTenantId"];
@@ -77,90 +83,70 @@ namespace ManagementLibrarySample
                 Console.WriteLine(rg.Name);
 
                 // Go through all the Websites in the resource group
-                var siteListResult = await _websiteClient.WebSites.ListAsync(rg.Name, null, new WebSiteListParameters());
-                foreach (var site in siteListResult)
+                var siteListResult = await _websiteClient.Sites.GetSitesAsync(rg.Name, null);
+                foreach (var site in siteListResult.Value)
                 {
                     Console.WriteLine("    " + site.Name);
                 }
             }
         }
 
-        static async Task CreateSite(string rgName, string whpName, string siteName, string location)
+        static async Task CreateSite(string rgName, string appServicePlanName, string siteName, string location)
         {
             // Create/Update the resource group
             var rgCreateResult = await _resourceGroupClient.ResourceGroups.CreateOrUpdateAsync(rgName, new ResourceGroup { Location = location });
 
-            // Create/Update the Web Hosting Plan
-            var whpCreateParams = new WebHostingPlanCreateOrUpdateParameters
+            // Create/Update the App Service Plan
+            var serverFarmWithRichSku = new ServerFarmWithRichSku
             {
-                WebHostingPlan = new WebHostingPlan
+                Location = location,
+                Sku = new SkuDescription
                 {
-                    Name = whpName,
-                    Location = location,
-                    Properties = new WebHostingPlanProperties
-                    {
-                        Sku = SkuOptions.Free
-                    }
+                    Name = "F1",
+                    Tier = "Free"
                 }
             };
-            var whpCreateResult = await _websiteClient.WebHostingPlans.CreateOrUpdateAsync(rgName, whpCreateParams);
+            serverFarmWithRichSku = await _websiteClient.ServerFarms.CreateOrUpdateServerFarmAsync(rgName, appServicePlanName, serverFarmWithRichSku);
 
             // Create/Update the Website
-            var createParams = new WebSiteCreateOrUpdateParameters
+            var site = new Site
             {
-                WebSite = new WebSiteBase
-                {
-                    Name = siteName,
-                    Location = location,
-                    Properties = new WebSiteBaseProperties
-                    {
-                        ServerFarm = whpName
-                    }
-                }
+                Location = location,
+                ServerFarmId = appServicePlanName
             };
-            var siteCreateResult = await _websiteClient.WebSites.CreateOrUpdateAsync(rgName, siteName, null /*slot*/, createParams);
+            site = await _websiteClient.Sites.CreateOrUpdateSiteAsync(rgName, siteName, site);
 
             // Create/Update the Website configuration
-            var siteUpdateParams = new WebSiteUpdateConfigurationParameters
+            var siteConfig = new SiteConfig
             {
                 Location = location,
-                Properties = new WebSiteUpdateConfigurationDetails
-                {
-                    PhpVersion = "5.6",
-                }
+                PhpVersion = "5.6"
             };
-            var siteUpdateRes = await _websiteClient.WebSites.UpdateConfigurationAsync(rgName, siteName, null /*slot*/, siteUpdateParams);
-
-            // List current App Settings
-            var appSettingsRes = await _websiteClient.WebSites.GetAppSettingsAsync(rgName, siteName, null /*slot*/);
-            foreach (var appSetting in appSettingsRes.Resource.Properties)
-            {
-                Console.WriteLine("{0} = {1}", appSetting.Name, appSetting.Value);
-            }
+            siteConfig = await _websiteClient.Sites.CreateOrUpdateSiteConfigAsync(rgName, siteName, siteConfig);
 
             // Create/Update some App Settings
-            var appSettingsParams = new WebSiteNameValueParameters
+            var appSettings = new StringDictionary
             {
                 Location = location,
-                Properties = new List<NameValuePair>
+                Properties = new Dictionary<string, string>
                 {
-                    new NameValuePair { Name = "MyFirstKey", Value = "My first value"},
-                    new NameValuePair { Name = "MySecondKey", Value = "My second value"}
+                    { "MyFirstKey", "My first value" },
+                    { "MySecondKey", "My second value" }
                 }
             };
-            appSettingsRes = await _websiteClient.WebSites.UpdateAppSettingsAsync(rgName, siteName, null /*slot*/, appSettingsParams);
+            await _websiteClient.Sites.UpdateSiteAppSettingsAsync(rgName, siteName, appSettings);
 
             // Create/Update some Connection Strings
-            var connStringsParams = new WebSiteUpdateConnectionStringsParameters
+            var connStrings = new ConnectionStringDictionary
             {
                 Location = location,
-                Properties = new List<ConnectionStringInfo>
+                Properties = new Dictionary<string, ConnStringValueTypePair>
                 {
-                    new ConnectionStringInfo { Name = "MyFirstConnString", ConnectionString = "My SQL conn string", Type = DatabaseServerType.SQLAzure},
-                    new ConnectionStringInfo { Name = "MySecondConnString", ConnectionString = "My custom conn string", Type = DatabaseServerType.Custom}
+                    { "MyFirstConnString", new ConnStringValueTypePair { Value = "My SQL conn string", Type = DatabaseServerType.SQLAzure }},
+                    { "MySecondConnString", new ConnStringValueTypePair { Value = "My custom conn string", Type = DatabaseServerType.Custom }}
                 }
             };
-            var connStringsRes = await _websiteClient.WebSites.UpdateConnectionStringsAsync(rgName, siteName, null /*slot*/, connStringsParams);
+            await _websiteClient.Sites.UpdateSiteConnectionStringsAsync(rgName, siteName, connStrings);
         }
     }
 }
