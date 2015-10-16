@@ -5,13 +5,13 @@ $ErrorActionPreference = "Stop"
 # Example call: ListAppServicePlans MyResourceGroup
 Function ListAppServicePlans($ResourceGroupName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -OutputObjectFormat New -IsCollection
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -IsCollection
 }
 
 # Example call: GetAppServicePlan MyResourceGroup MyWHP
 Function GetAppServicePlan($ResourceGroupName, $PlanName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -OutputObjectFormat New -ApiVersion 2015-08-01
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -ApiVersion 2015-08-01
 }
 
 # Example call: CreateAppServicePlan MyResourceGroup "North Europe" MyHostingPlan
@@ -25,13 +25,13 @@ Function CreateAppServicePlan($ResourceGroupName, $Location, $PlanName, $SkuName
         }
     }
 
-    New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -IsFullObject -PropertyObject $fullObject -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -IsFullObject -PropertyObject $fullObject -ApiVersion 2015-08-01 -Force
 }
 
 # Example call: DeleteWebApp MyResourceGroup MySite
 Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
 {
-    Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -ApiVersion 2015-08-01 -Force
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -Name $PlanName -ApiVersion 2015-08-01 -Force
 }
 
 
@@ -41,25 +41,25 @@ Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
 # Example call: ListWebApps MyResourceGroup
 Function ListWebApps($ResourceGroupName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -OutputObjectFormat New
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites
 }
 
 # Example call: GetWebApp MyResourceGroup MySite
 Function GetWebApp($ResourceGroupName, $SiteName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -OutputObjectFormat New -ApiVersion 2015-08-01
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -ApiVersion 2015-08-01
 }
 
 # Example call: CreateWebApp MyResourceGroup "North Europe" MySite DefaultServerFarm
 Function CreateWebApp($ResourceGroupName, $Location, $SiteName, $PlanName)
 {
-    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject @{ webHostingPlan = $PlanName } -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject @{ webHostingPlan = $PlanName } -ApiVersion 2015-08-01 -Force
 }
 
 # Example call: DeleteWebApp MyResourceGroup MySite
 Function DeleteWebApp($ResourceGroupName, $SiteName)
 {
-    Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -ApiVersion 2015-08-01 -Force
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -ApiVersion 2015-08-01 -Force
 }
 
 # Example call: $planId = GetSiteAppServicePlanId MyResourceGroup MySite
@@ -75,13 +75,13 @@ Function GetSiteAppServicePlanId($ResourceGroupName, $SiteName)
 # Example call: GetWebAppConfig MyResourceGroup MySite
 Function GetWebAppConfig($ResourceGroupName, $SiteName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -OutputObjectFormat New -ApiVersion 2015-08-01
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -ApiVersion 2015-08-01
 }
 
 # Example call: SetWebAppConfig MyResourceGroup MySite $ConfigObject
 Function SetWebAppConfig($ResourceGroupName, $SiteName, $ConfigObject)
 {
-    Set-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -PropertyObject $ConfigObject -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    Set-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -PropertyObject $ConfigObject -ApiVersion 2015-08-01 -Force
 }
 
 # Example call: $phpVersion = GetPHPVersion MyResourceGroup MySite
@@ -103,14 +103,14 @@ Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
 # Example call: GetWebAppAppSettings MyResourceGroup MySite
 Function GetWebAppAppSettings($ResourceGroupName, $SiteName)
 {
-    $res = Invoke-AzureResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/appsettings -Action list -ApiVersion 2015-08-01 -Force
+    $res = Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/appsettings -Action list -ApiVersion 2015-08-01 -Force
     $res.Properties
 }
 
 # Example call: SetWebAppAppSettings MyResourceGroup MySite @{ key1 = "val1"; key2 = "val2" }
 Function SetWebAppAppSettings($ResourceGroupName, $SiteName, $AppSettingsObject)
 {
-    New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/appsettings -PropertyObject $AppSettingsObject -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/appsettings -PropertyObject $AppSettingsObject -ApiVersion 2015-08-01 -Force
 }
 
 
@@ -119,14 +119,14 @@ Function SetWebAppAppSettings($ResourceGroupName, $SiteName, $AppSettingsObject)
 # Example call: GetWebAppConnectionStrings MyResourceGroup MySite
 Function GetWebAppConnectionStrings($ResourceGroupName, $SiteName)
 {
-    $res = Invoke-AzureResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -Action list -ApiVersion 2015-08-01 -Force
+    $res = Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -Action list -ApiVersion 2015-08-01 -Force
     $res.Properties
 }
 
 # Example call: SetWebAppConnectionStrings MyResourceGroup MySite @{ conn1 = @{ Value = "Some connection string"; Type = 2  } }
 Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionStringsObject)
 {
-    New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -PropertyObject $ConnectionStringsObject -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/connectionstrings -PropertyObject $ConnectionStringsObject -ApiVersion 2015-08-01 -Force
 }
 
 
@@ -135,7 +135,7 @@ Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionSt
 # Example call: DeployCloudHostedPackage MyResourceGroup "West US" MySite https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 Function DeployCloudHostedPackage($ResourceGroupName, $Location, $SiteName, $packageUrl)
 {
-    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/Extensions -Name $SiteName/MSDeploy -PropertyObject @{ "packageUri" = $packageUrl } -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/Extensions -Name $SiteName/MSDeploy -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion 2015-08-01 -Force
 }
 
 # Deploy from an external git repo
@@ -147,13 +147,13 @@ Function HookupExternalGitRepo($ResourceGroupName, $SiteName, $repoUrl)
         IsManualIntegration = true
     }
 
-    New-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/SourceControls -Name $SiteName/Web -PropertyObject $props -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/SourceControls -Name $SiteName/Web -PropertyObject $props -ApiVersion 2015-08-01 -Force
 }
 
 # Deploy from an external git repo
 Function GetGitDeployments($ResourceGroupName, $SiteName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Deployments -Name $SiteName -OutputObjectFormat New -ApiVersion 2015-08-01
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Deployments -Name $SiteName -ApiVersion 2015-08-01
 }
 
 
@@ -170,13 +170,13 @@ Function UploadCert($ResourceGroupName, $Location, $PfxPath, $PfxPassword, $Cert
         Password = $PfxPassword
     }
 
-    New-AzureResource -Location $Location -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -PropertyObject $props -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -Location $Location -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -PropertyObject $props -ApiVersion 2015-08-01 -Force
 }
 
 # Example call: DeleteCert MyResourceGroup MyCert
 Function DeleteCert($ResourceGroupName, $CertName)
 {
-    Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -ApiVersion 2015-08-01 -Force
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/certificates -Name $CertName -ApiVersion 2015-08-01 -Force
 }
 
 
@@ -184,7 +184,7 @@ Function DeleteCert($ResourceGroupName, $CertName)
 
 Function GetWebAppAddons($ResourceGroupName, $SiteName)
 {
-    Get-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName -OutputObjectFormat New -ApiVersion 2015-08-01 -IsCollection
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName -ApiVersion 2015-08-01 -IsCollection
 }
 
 Function AddZrayAddon($ResourceGroupName, $Location, $SiteName, $Name, $PlanName)
@@ -195,10 +195,10 @@ Function AddZrayAddon($ResourceGroupName, $Location, $SiteName, $Name, $PlanName
         product = "z-ray"
     }
 
-    New-AzureResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -Properties @{} -PlanObject $plan -OutputObjectFormat New -ApiVersion 2015-08-01 -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -Properties @{} -PlanObject $plan -ApiVersion 2015-08-01 -Force
 }
 
 Function RemoveWebAppAddon($ResourceGroupName, $SiteName, $Name)
 {
-    Remove-AzureResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -ApiVersion 2015-08-01 -Force
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -ApiVersion 2015-08-01 -Force
 }

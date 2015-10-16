@@ -4,7 +4,7 @@ $SiteName = "PSTest7775"
 $PlanName = "MyPlan"
 
 Write-Host "Creating Resource Group"
-New-AzureResourceGroup -Name $ResourceGroupName -Location $Location -Force
+New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Location -Force
 
 Write-Host "Creating App Service Plan"
 CreateAppServicePlan $ResourceGroupName $Location $PlanName
