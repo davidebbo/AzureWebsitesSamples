@@ -157,6 +157,27 @@ Function GetGitDeployments($ResourceGroupName, $SiteName)
 }
 
 
+## Site extension operations
+
+# Example call: ListWebAppSiteExtensions MyResourceGroup MySite
+Function ListWebAppSiteExtensions($ResourceGroupName, $SiteName)
+{
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName -ApiVersion 2015-08-01 -IsCollection
+}
+
+# Example call: InstallSiteExtension MyResourceGroup MySite filecounter
+Function InstallSiteExtension($ResourceGroupName, $SiteName, $Name)
+{
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName/$Name -PropertyObject @{} -ApiVersion 2015-08-01 -Force
+}
+
+# Example call: UninstallSiteExtension MyResourceGroup MySite filecounter
+Function UninstallSiteExtension($ResourceGroupName, $SiteName, $Name)
+{
+    Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName/$Name -ApiVersion 2015-08-01 -Force
+}
+
+
 ## Certificate operations
 
 # Example call: UploadCert MyResourceGroup "North Europe" foo.pfx "MyPassword!" MyTestCert

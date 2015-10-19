@@ -69,6 +69,10 @@ GetPHPVersion $ResourceGroupName $SiteName
 Write-Host "Deploying bakery sample using msdeploy"
 DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 
+InstallSiteExtension $ResourceGroupName $SiteName filecounter
+ListWebAppSiteExtensions $ResourceGroupName $SiteName
+UninstallSiteExtension $ResourceGroupName $SiteName filecounter
+
 Write-Host "Enabling the ZRay addon"
 AddZrayAddon $ResourceGroupName $Location $SiteName MyZray "free"
 
