@@ -46,6 +46,9 @@ $response = Invoke-WebRequest $hostName
 Write-Host $response.StatusCode
 Write-Host $response.Content
 
+Write-Host "Deploying bakery sample using msdeploy"
+DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
+
 Write-Host "Setting some app settings"
 SetWebAppAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2" }
 
@@ -65,9 +68,6 @@ GetWebAppConnectionStrings $ResourceGroupName $SiteName
 Write-Host "Setting the PHP version and reading it back"
 SetPHPVersion $ResourceGroupName $SiteName 5.6
 GetPHPVersion $ResourceGroupName $SiteName
-
-Write-Host "Deploying bakery sample using msdeploy"
-DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 
 Write-Host "Installing site extension"
 InstallSiteExtension $ResourceGroupName $SiteName filecounter
