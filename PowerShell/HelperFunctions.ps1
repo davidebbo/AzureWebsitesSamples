@@ -130,6 +130,23 @@ Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionSt
 }
 
 
+## Slot settings
+
+# Example call: GetSlotSettings MyResourceGroup MySite
+Function GetSlotSettings($ResourceGroupName, $SiteName)
+{
+    $res = Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/slotConfigNames -ApiVersion 2015-08-01
+    $res.Properties
+}
+
+# Example call: SetSlotSettings MyResourceGroup MySite @{ appSettingNames = @("Setting1"); connectionStringNames = @("Conn1","Conn2") }
+Function SetSlotSettings($ResourceGroupName, $SiteName, $SlotSettingsObject)
+{
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/slotConfigNames -PropertyObject $SlotSettingsObject -ApiVersion 2015-08-01 -Force
+}
+
+
+
 ## Deployment related operations
 
 # Example call: DeployCloudHostedPackage MyResourceGroup "West US" MySite https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip

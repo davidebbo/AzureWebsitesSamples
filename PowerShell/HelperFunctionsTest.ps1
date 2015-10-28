@@ -65,6 +65,9 @@ SetWebAppConnectionStrings $ResourceGroupName $SiteName $props
 Write-Host "Reading the connection strings"
 GetWebAppConnectionStrings $ResourceGroupName $SiteName
 
+SetSlotSettings $ResourceGroupName $SiteName @{ appSettingNames = @("key1"); connectionStringNames = "MyConn","MyConn2" }
+GetSlotSettings $ResourceGroupName $SiteName
+
 Write-Host "Setting the PHP version and reading it back"
 SetPHPVersion $ResourceGroupName $SiteName 5.6
 GetPHPVersion $ResourceGroupName $SiteName
