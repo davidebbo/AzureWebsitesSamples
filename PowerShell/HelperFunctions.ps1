@@ -155,6 +155,16 @@ Function DeployCloudHostedPackage($ResourceGroupName, $Location, $SiteName, $pac
     New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/Extensions -Name $SiteName/MSDeploy -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion 2015-08-01 -Force
 }
 
+# Example call: GetPublishingProfile MyResourceGroup "MySite
+Function GetPublishingProfile($ResourceGroupName, $SiteName)
+{
+    $ParametersObject = @{
+	    format = "xml"
+    }
+
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ResourceName $SiteName -Action publishxml -Parameters $ParametersObject -ApiVersion 2015-08-01 -Force
+}
+
 # Deploy from an external git repo
 Function HookupExternalGitRepo($ResourceGroupName, $SiteName, $repoUrl)
 {
