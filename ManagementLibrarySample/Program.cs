@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure;
+using Microsoft.Azure.Common.Authentication.Models;
 using Microsoft.Azure.Management.Resources;
 using Microsoft.Azure.Management.Resources.Models;
 using Microsoft.Azure.Management.WebSites;
@@ -17,6 +19,7 @@ namespace ManagementLibrarySample
     {
         private static ResourceManagementClient _resourceGroupClient;
         private static WebSiteManagementClient _websiteClient;
+        private static AzureEnvironment _environment;
 
         static void Main(string[] args)
         {
@@ -32,9 +35,12 @@ namespace ManagementLibrarySample
 
         static async Task MainAsync()
         {
+            // Set Environment - Choose between Azure public cloud, china cloud and US govt. cloud
+            _environment = AzureEnvironment.PublicEnvironments[EnvironmentName.AzureCloud];
+
             // Get the credentials
             TokenCloudCredentials cloudCreds = GetCredsFromServicePrincipal();
-
+            
             var tokenCreds = new TokenCredentials(cloudCreds.Token);
 
             var loggingHandler = new LoggingHandler(new HttpClientHandler());
@@ -43,14 +49,31 @@ namespace ManagementLibrarySample
             var httpClient = new HttpClient(loggingHandler);
 
             // Use the creds to create the clients we need
-            _resourceGroupClient = new ResourceManagementClient(cloudCreds, httpClient);
-            _websiteClient = new WebSiteManagementClient(tokenCreds, loggingHandler);
+            _resourceGroupClient = new ResourceManagementClient(cloudCreds, _environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), httpClient);
+            _websiteClient = new WebSiteManagementClient(_environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), tokenCreds, loggingHandler);
             _websiteClient.SubscriptionId = cloudCreds.SubscriptionId;
 
             await ListResourceGroupsAndSites();
 
             // Note: site names are globally unique, so you may need to change it to avoid conflicts
             await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI", "West US");
+
+            // Upload certificate to resource group
+            await UpdateLoadCertificate("MyResourceGroup", "CertificateName", "West US", "PathToPfxFile", "CertificatePassword");
+        }
+
+        private static Task UpdateLoadCertificate(string resourceGroupName, string certificateName, string location, string pathToPfxFile, string certificatePassword)
+        {
+            var pfxAsBytes = File.ReadAllBytes(pathToPfxFile);
+            var pfxBlob = Convert.ToBase64String(pfxAsBytes);
+            var certificate = new Certificate
+            {
+                Location = location,
+                Password = certificatePassword,
+                PfxBlob = pfxBlob
+            };
+
+            return _websiteClient.Certificates.CreateOrUpdateCertificateAsync(resourceGroupName, certificateName, certificate);
         }
 
         private static TokenCloudCredentials GetCredsFromServicePrincipal()
@@ -66,11 +89,10 @@ namespace ManagementLibrarySample
                 throw new Exception("You need to enter your appSettings in app.config to run this sample");
             }
 
-            var authority = String.Format("{0}/{1}", "https://login.windows.net", tenantId);
+            var authority = String.Format("{0}{1}", _environment.Endpoints[AzureEnvironment.Endpoint.ActiveDirectory], tenantId);
             var authContext = new AuthenticationContext(authority);
             var credential = new ClientCredential(clientId, clientSecret);
-            var authResult = authContext.AcquireToken("https://management.core.windows.net/", credential);
-
+            var authResult = authContext.AcquireToken(_environment.Endpoints[AzureEnvironment.Endpoint.ActiveDirectoryServiceEndpointResourceId], credential);
             return new TokenCloudCredentials(subscription, authResult.AccessToken);
         }
 
