@@ -250,3 +250,10 @@ Function RemoveWebAppAddon($ResourceGroupName, $SiteName, $Name)
 {
     Remove-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName/$Name -ApiVersion 2015-08-01 -Force
 }
+
+## Sync repository
+
+Function SyncWebApp($ResourceGroupName, $SiteName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName  -Action sync -ApiVersion 2015-08-01 -Force
+}
