@@ -177,7 +177,7 @@ Function HookupExternalGitRepo($ResourceGroupName, $SiteName, $repoUrl)
     New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/SourceControls -Name $SiteName/Web -PropertyObject $props -ApiVersion 2015-08-01 -Force
 }
 
-# Deploy from an external git repo
+# Get the list of git deployments
 Function GetGitDeployments($ResourceGroupName, $SiteName)
 {
     Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Deployments -Name $SiteName -ApiVersion 2015-08-01
