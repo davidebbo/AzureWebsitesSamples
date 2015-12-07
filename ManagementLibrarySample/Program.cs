@@ -169,6 +169,9 @@ namespace ManagementLibrarySample
                 }
             };
             await _websiteClient.Sites.UpdateSiteConnectionStringsAsync(rgName, siteName, connStrings);
+
+            // Restart the site
+            await _websiteClient.Sites.RestartSiteAsync(rgName, siteName, softRestart: true);
         }
     }
 }
