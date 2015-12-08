@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 # Example call: ListAppServicePlans MyResourceGroup
 Function ListAppServicePlans($ResourceGroupName)
 {
-    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -IsCollection
+    Find-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/serverfarms -ApiVersion 2015-11-01
 }
 
 # Example call: GetAppServicePlan MyResourceGroup MyWHP
@@ -41,7 +41,7 @@ Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
 # Example call: ListWebApps MyResourceGroup
 Function ListWebApps($ResourceGroupName)
 {
-    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites
+    Find-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ApiVersion 2015-11-01
 }
 
 # Example call: GetWebApp MyResourceGroup MySite
