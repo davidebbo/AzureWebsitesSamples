@@ -10,7 +10,7 @@ namespace HttpClientSample
 {
     class Program
     {
-        static string _subscription = ConfigurationManager.AppSettings["AzureSubscription"];
+        static string Subscription = ConfigurationManager.AppSettings["AzureSubscription"];
 
         static void Main(string[] args)
         {
@@ -51,7 +51,7 @@ namespace HttpClientSample
             // Create the resource group
 
             using (var response = await client.PutAsJsonAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}?api-version=2015-11-01",
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}?api-version=2015-11-01",
                 new
                 {
                     location = Location
@@ -63,7 +63,7 @@ namespace HttpClientSample
             // Create the App Service Plan
 
             using (var response = await client.PutAsJsonAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/serverfarms/{AppServicePlan}?api-version=2015-08-01",
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/serverfarms/{AppServicePlan}?api-version=2015-08-01",
                 new
                 {
                     location = Location,
@@ -79,7 +79,7 @@ namespace HttpClientSample
             // Create the Web App
 
             using (var response = await client.PutAsJsonAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}?api-version=2015-08-01",
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}?api-version=2015-08-01",
                 new
                 {
                     location = Location,
@@ -95,7 +95,7 @@ namespace HttpClientSample
             // List the Web Apps and their host names
 
             using (var response = await client.GetAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites?api-version=2015-08-01"))
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites?api-version=2015-08-01"))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -113,7 +113,7 @@ namespace HttpClientSample
             // Set some app settings
 
             using (var response = await client.PutAsJsonAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/config/appsettings?api-version=2015-08-01",
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/config/appsettings?api-version=2015-08-01",
                 new
                 {
                     properties = new
@@ -129,7 +129,7 @@ namespace HttpClientSample
             // Turn on http logging
 
             using (var response = await client.PutAsJsonAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/config/logs?api-version=2015-08-01",
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/config/logs?api-version=2015-08-01",
                 new
                 {
                     properties = new
@@ -150,7 +150,7 @@ namespace HttpClientSample
             // Stop the app
 
             using (var response = await client.PostAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/stop?api-version=2015-08-01",
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/stop?api-version=2015-08-01",
                 null))
             {
                 response.EnsureSuccessStatusCode();
@@ -159,7 +159,7 @@ namespace HttpClientSample
             // Delete the Web App
 
             using (var response = await client.DeleteAsync(
-                $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}?api-version=2015-08-01"))
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}?api-version=2015-08-01"))
             {
                 response.EnsureSuccessStatusCode();
             }
