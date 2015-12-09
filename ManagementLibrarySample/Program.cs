@@ -170,6 +170,14 @@ namespace ManagementLibrarySample
             };
             await _websiteClient.Sites.UpdateSiteConnectionStringsAsync(rgName, siteName, connStrings);
 
+            // List the site quotas
+            Console.WriteLine("Site quotas:");
+            CsmUsageQuotaCollection quotas = await _websiteClient.Sites.GetSiteUsagesAsync(rgName, siteName);
+            foreach (var quota in quotas.Value)
+            {
+                Console.WriteLine($"    {quota.Name.Value}: {quota.CurrentValue} {quota.Unit}");
+            }
+
             // Restart the site
             await _websiteClient.Sites.RestartSiteAsync(rgName, siteName, softRestart: true);
         }
