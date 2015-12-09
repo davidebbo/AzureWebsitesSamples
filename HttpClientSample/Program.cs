@@ -50,50 +50,44 @@ namespace HttpClientSample
 
             // Create the resource group
 
-            object body = new
-            {
-                location = Location
-            };
-
             using (var response = await client.PutAsJsonAsync(
                 $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}?api-version=2015-11-01",
-                body))
+                new
+                {
+                    location = Location
+                }))
             {
                 response.EnsureSuccessStatusCode();
             }
 
             // Create the App Service Plan
 
-            body = new
-            {
-                location = Location,
-                Sku = new
-                {
-                    Name = "F1"
-                }
-            };
-
             using (var response = await client.PutAsJsonAsync(
                 $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/serverfarms/{AppServicePlan}?api-version=2015-08-01",
-                body))
+                new
+                {
+                    location = Location,
+                    Sku = new
+                    {
+                        Name = "F1"
+                    }
+                }))
             {
                 response.EnsureSuccessStatusCode();
             }
 
             // Create the Web App
 
-            body = new
-            {
-                location = Location,
-                properties = new
-                {
-                    serverFarmId = AppServicePlan
-                }
-            };
-
             using (var response = await client.PutAsJsonAsync(
                 $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}?api-version=2015-08-01",
-                body))
+                new
+                {
+                    location = Location,
+                    properties = new
+                    {
+                        serverFarmId = AppServicePlan
+                    }
+                }))
             {
                 response.EnsureSuccessStatusCode();
             }
@@ -118,41 +112,37 @@ namespace HttpClientSample
 
             // Set some app settings
 
-            body = new
-            {
-                properties = new
-                {
-                    Foo = "Hello",
-                    Bar = "Bye",
-                }
-            };
-
             using (var response = await client.PutAsJsonAsync(
                 $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/config/appsettings?api-version=2015-08-01",
-                body))
+                new
+                {
+                    properties = new
+                    {
+                        Foo = "Hello",
+                        Bar = "Bye",
+                    }
+                }))
             {
                 response.EnsureSuccessStatusCode();
             }
 
             // Turn on http logging
 
-            body = new
-            {
-                properties = new
-                {
-                    httpLogs = new
-                    {
-                        fileSystem = new
-                        {
-                            enabled = true
-                        }
-                    }
-                }
-            };
-
             using (var response = await client.PutAsJsonAsync(
                 $"/subscriptions/{_subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}/config/logs?api-version=2015-08-01",
-                body))
+                new
+                {
+                    properties = new
+                    {
+                        httpLogs = new
+                        {
+                            fileSystem = new
+                            {
+                                enabled = true
+                            }
+                        }
+                    }
+                }))
             {
                 response.EnsureSuccessStatusCode();
             }
