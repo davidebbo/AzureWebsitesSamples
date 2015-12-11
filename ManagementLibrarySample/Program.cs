@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure;
@@ -60,6 +61,9 @@ namespace ManagementLibrarySample
 
             // Upload certificate to resource group
             await UpdateLoadCertificate("MyResourceGroup", "CertificateName", "West US", "PathToPfxFile", "CertificatePassword");
+
+            // Bind certificate to resource group
+            await BindCertificateToSite("MyResourceGroup", "SiteName", "CertificateName", "hostName");
         }
 
         private static Task UpdateLoadCertificate(string resourceGroupName, string certificateName, string location, string pathToPfxFile, string certificatePassword)
@@ -74,6 +78,34 @@ namespace ManagementLibrarySample
             };
 
             return _websiteClient.Certificates.CreateOrUpdateCertificateAsync(resourceGroupName, certificateName, certificate);
+        }
+
+        private static Task BindCertificateToSite(string resourceGroupName, string siteName, string certificateName, string hostName)
+        {
+            var certificate = _websiteClient.Certificates.GetCertificate(resourceGroupName, certificateName);
+            var site = _websiteClient.Sites.GetSite(resourceGroupName, siteName);
+            
+            if(!site.HostNames.Any(h => string.Equals(h, hostName, StringComparison.OrdinalIgnoreCase)))
+            {
+                site.HostNames.Add(hostName);
+            }
+
+            if (site.HostNameSslStates == null)
+            {
+                site.HostNameSslStates = new List<HostNameSslState>();
+            }
+
+            if (!site.HostNameSslStates.Any(s => string.Equals(s.Name, hostName, StringComparison.OrdinalIgnoreCase)))
+            {
+                site.HostNameSslStates.Add(new HostNameSslState
+                {
+                    Name = hostName, 
+                    Thumbprint = certificate.Thumbprint,
+                    SslState = SslState.SniEnabled
+                });
+            }
+
+            return _websiteClient.Sites.CreateOrUpdateSiteAsync(resourceGroupName, siteName, site);
         }
 
         private static TokenCloudCredentials GetCredsFromServicePrincipal()
