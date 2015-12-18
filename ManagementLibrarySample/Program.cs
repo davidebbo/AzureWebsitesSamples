@@ -101,7 +101,8 @@ namespace ManagementLibrarySample
                 {
                     Name = hostName, 
                     Thumbprint = certificate.Thumbprint,
-                    SslState = SslState.SniEnabled
+                    SslState = SslState.SniEnabled,
+                    ToUpdate = true
                 });
             }
 
