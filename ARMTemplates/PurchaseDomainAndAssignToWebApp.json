@@ -1,0 +1,109 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domainName": {
+      "type": "string",
+    },
+    "consent": {
+      "type": "object",
+    },
+    "addressMailing": {
+      "type": "object",
+    },
+    "email": {
+      "type": "string",
+    },
+    "fax": {
+      "type": "string",
+    },
+    "jobTitle": {
+      "type": "string",
+    },
+    "nameFirst": {
+      "type": "string",
+    },
+    "nameLast": {
+      "type": "string",
+    },
+    "nameMiddle": {
+      "type": "string",
+    },
+    "organization": {
+      "type": "string",
+    },
+    "phone": {
+      "type": "string",
+    },
+    "privacy": {
+      "type": "bool",
+    },
+    "autoRenew": {
+      "type": "bool",
+    },
+    "siteLocation": {
+      "type": "string",
+    },
+    "siteName": {
+      "type": "string",
+    } 
+  },
+  "variables": {
+   "domainContact": {
+     "AddressMailing": "[parameters('addressMailing')]",
+     "Email": "[parameters('email')]",
+     "Fax": "[parameters('fax')]",
+     "JobTitle": "[parameters('jobTitle')]",
+     "NameFirst": "[parameters('nameFirst')]",
+     "NameLast": "[parameters('nameLast')]",
+     "NameMiddle": "[parameters('nameMiddle')]",
+     "Organization": "[parameters('organization')]",
+     "Phone": "[parameters('phone')]"
+   },
+   "wwwHostName":"[concat('www.', parameters('domainName'))]"
+   },
+  "resources": [
+    {
+      "type": "Microsoft.DomainRegistration/domains",
+      "name": "[parameters('domainName')]",
+      "apiVersion": "2015-04-01",
+      "location": "global",
+      "properties": {
+        "Consent": "[parameters('consent')]",
+        "ContactAdmin": "[variables('domainContact')]",
+        "ContactBilling": "[variables('domainContact')]",
+        "ContactRegistrant": "[variables('domainContact')]",
+        "ContactTech": "[variables('domainContact')]",
+        "Privacy" : "[parameters('privacy')]",
+        "AutoRenew" : "[parameters('autoRenew')]"
+      }
+    },    
+    {
+      "type": "Microsoft.Web/sites/hostnameBindings",
+      "name": "[concat(parameters('siteName'), concat('/', variables('wwwHostName')))]",
+      "apiVersion": "2015-04-01",
+      "location": "[parameters('siteLocation')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.DomainRegistration/domains', parameters('domainName'))]"
+      ],
+      "properties": {
+        "azureResourceType": "Website",
+        "domainId": "[resourceId('Microsoft.DomainRegistration/domains', parameters('domainName'))]",
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostnameBindings",
+      "name": "[concat(parameters('siteName'), concat('/', parameters('domainName')))]",
+      "apiVersion": "2015-04-01",
+      "location": "[parameters('siteLocation')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.DomainRegistration/domains', parameters('domainName'))]",
+          "[resourceId('Microsoft.Web/sites/hostnameBindings', parameters('siteName'), variables('wwwHostName'))]",
+      ],
+      "properties": {
+        "azureResourceType": "Website",
+        "domainId": "[resourceId('Microsoft.DomainRegistration/domains', parameters('domainName'))]",
+      }
+    }
+  ]
+}

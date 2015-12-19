@@ -1,0 +1,62 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domainName": {
+      "value": "availabledomain.com"
+    },
+    "consent": {
+      "value": {
+        "agreementKeys": ["DNRA","DNPA"],
+        "agreedBy": "192.168.1.1",
+        "agreedAt": "2015-12-11T09: 25: 30.6850404Z"
+      }
+    },
+    "addressMailing": {
+      "value": {
+        "address1": "One Microsoft Way",
+        "address2": "Microsoft Campus",
+        "city": "Redmond",
+        "country": "US",
+        "postalCode": "98052",
+        "state": "WA"
+        }
+    },
+    "email": {
+      "value": "emailAddress@hotmail.com"
+    },
+    "fax": {
+      "value": "+1.4254254255"
+    },
+    "jobTitle": {
+      "value": "Software Engineer"
+    },
+    "nameFirst": {
+      "value": "First"
+    },
+    "nameLast": {
+      "value": "Last"
+    },
+    "nameMiddle": {
+      "value": "D"
+    },
+    "organization": {
+      "value": "Microsoft Corporation"
+    },
+    "Phone": {
+      "value": "+1.4254254255"
+    },
+    "privacy": {
+      "value": true,
+    },
+    "autoRenew": {
+      "value": true,
+    },
+    "siteLocation": {
+      "value": "West US"
+    },
+    "siteName": {
+      "value": "siteName"
+    }
+  }
+}
