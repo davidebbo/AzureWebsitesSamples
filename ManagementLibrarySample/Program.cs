@@ -13,6 +13,7 @@ using Microsoft.Azure.Management.WebSites;
 using Microsoft.Azure.Management.WebSites.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
+using Microsoft.Rest.Azure;
 
 namespace ManagementLibrarySample
 {
@@ -50,7 +51,8 @@ namespace ManagementLibrarySample
             var httpClient = new HttpClient(loggingHandler);
 
             // Use the creds to create the clients we need
-            _resourceGroupClient = new ResourceManagementClient(cloudCreds, _environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), httpClient);
+            _resourceGroupClient = new ResourceManagementClient(_environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), tokenCreds, loggingHandler);
+            _resourceGroupClient.SubscriptionId = cloudCreds.SubscriptionId;
             _websiteClient = new WebSiteManagementClient(_environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), tokenCreds, loggingHandler);
             _websiteClient.SubscriptionId = cloudCreds.SubscriptionId;
 
@@ -132,8 +134,8 @@ namespace ManagementLibrarySample
         static async Task ListResourceGroupsAndSites()
         {
             // Go through all the resource groups in the subscription
-            var rgListResult = await _resourceGroupClient.ResourceGroups.ListAsync(new ResourceGroupListParameters());
-            foreach (var rg in rgListResult.ResourceGroups)
+            IPage<ResourceGroup> rgListResult = await _resourceGroupClient.ResourceGroups.ListAsync();
+            foreach (var rg in rgListResult)
             {
                 Console.WriteLine(rg.Name);
 
