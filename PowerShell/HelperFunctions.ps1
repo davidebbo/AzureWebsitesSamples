@@ -167,6 +167,13 @@ Function GetPublishingProfile($ResourceGroupName, $SiteName)
     Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ResourceName $SiteName -Action publishxml -Parameters $ParametersObject -ApiVersion $WebAppApiVersion -Force
 }
 
+# Example call: GetPublishingCredentials MyResourceGroup "MySite
+Function GetPublishingCredentials($ResourceGroupName, $SiteName)
+{
+    $resource = Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/config -ResourceName $SiteName/publishingcredentials -Action list -ApiVersion 2015-08-01 -Force
+    $resource.Properties
+}
+
 # Deploy from an external git repo
 Function HookupExternalGitRepo($ResourceGroupName, $SiteName, $repoUrl)
 {

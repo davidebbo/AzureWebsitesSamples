@@ -52,6 +52,9 @@ DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktpl
 Write-Host "Getting the publishing profile XML"
 GetPublishingProfile $ResourceGroupName $SiteName
 
+Write-Host "Getting the publishing credentials"
+GetPublishingCredentials $ResourceGroupName $SiteName
+
 Write-Host "Setting some app settings"
 SetWebAppAppSettings $ResourceGroupName $SiteName @{ key1 = "val1"; key2 = "val2" }
 
