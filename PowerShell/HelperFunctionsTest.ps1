@@ -46,6 +46,7 @@ $response = Invoke-WebRequest $hostName
 Write-Host $response.StatusCode
 Write-Host $response.Content
 
+ListTriggeredWebJob $ResourceGroupName $SiteName
 $WebJobName = "SomeWebJob"
 Write-Host Displaying triggered WebJob details
 GetTriggeredWebJob $ResourceGroupName $SiteName $WebJobName

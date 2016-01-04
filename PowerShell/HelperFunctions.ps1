@@ -195,6 +195,14 @@ Function GetGitDeployments($ResourceGroupName, $SiteName)
 
 ## WebJobs operations
 
+# Example call: ListTriggeredWebJob MyResourceGroup MySite
+Function ListTriggeredWebJob($ResourceGroupName, $SiteName)
+{
+    # Use -ResourceId because Get-AzureRmResource doesn't support listing collections at the Resource Provider level
+    $Subscription = (Get-AzureRmContext).Subscription.SubscriptionId
+    Get-AzureRmResource -ResourceId /subscriptions/$Subscription/resourceGroups/$ResourceGroupName/providers/Microsoft.Web/sites/$SiteName/TriggeredWebJobs -ApiVersion 2015-08-01
+}
+
 # Example call: GetTriggeredWebJob MyResourceGroup MySite MyWebJob
 Function GetTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName)
 {
