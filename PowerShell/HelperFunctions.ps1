@@ -180,7 +180,7 @@ Function HookupExternalGitRepo($ResourceGroupName, $SiteName, $repoUrl)
     $props = @{
         RepoUrl = $repoUrl
         Branch = "master"
-        IsManualIntegration = true
+        IsManualIntegration = $true
     }
 
     New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/SourceControls -Name $SiteName/Web -PropertyObject $props -ApiVersion $WebAppApiVersion -Force
