@@ -193,6 +193,21 @@ Function GetGitDeployments($ResourceGroupName, $SiteName)
 }
 
 
+## WebJobs operations
+
+# Example call: GetTriggeredWebJob MyResourceGroup MySite MyWebJob
+Function GetTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName)
+{
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/TriggeredWebJobs -Name $SiteName/$WebJobName -ApiVersion $WebAppApiVersion
+}
+
+# Example call: RunTriggeredWebJob MyResourceGroup MySite MyWebJob
+Function RunTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/TriggeredWebJobs -ResourceName $SiteName/$WebJobName -Action run -ApiVersion $WebAppApiVersion -Force
+}
+
+
 ## Site extension operations
 
 # Example call: ListWebAppSiteExtensions MyResourceGroup MySite

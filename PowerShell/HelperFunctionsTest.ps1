@@ -46,6 +46,13 @@ $response = Invoke-WebRequest $hostName
 Write-Host $response.StatusCode
 Write-Host $response.Content
 
+$WebJobName = "SomeWebJob"
+Write-Host Displaying triggered WebJob details
+GetTriggeredWebJob $ResourceGroupName $SiteName $WebJobName
+
+Write-Host Running the triggered WebJob
+RunTriggeredWebJob $ResourceGroupName $SiteName $WebJobName
+
 Write-Host "Deploying bakery sample using msdeploy"
 DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 
