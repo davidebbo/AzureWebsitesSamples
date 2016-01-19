@@ -61,10 +61,6 @@
             "use32BitWorkerProcess": false, /* 64-bit platform */
             "webSocketsEnabled": true,
             "alwaysOn": true,
-            "requestTracingEnabled": true, /* Failed request tracing, aka 'freb' */
-            "httpLoggingEnabled": true, /* IIS logs (aka Web server logging) */
-            "logsDirectorySizeLimit": 40, /* 40 MB limit for IIS logs */
-            "detailedErrorLoggingEnabled": true, /* Detailed error messages  */
             "remoteDebuggingEnabled": true,
             "remoteDebuggingVersion": "VS2013",
 
@@ -108,6 +104,33 @@
           "properties": {
             "ConnString1": { "value": "My custom connection string", "type": "custom" },
             "ConnString2": { "value": "My SQL connection string", "type": "SQLAzure" }
+          }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "name": "logs",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": {
+            "applicationLogs": {
+              "fileSystem": {
+                "level": "Warning"
+              }
+            },
+            "httpLogs": {
+              "fileSystem": {
+                "retentionInMb": 40,
+                "enabled": true
+              }
+            },
+            "failedRequestsTracing": {
+              "enabled": true
+            },
+            "detailedErrorMessages": {
+              "enabled": true
+            }
           }
         },
         {
