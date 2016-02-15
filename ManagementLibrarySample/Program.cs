@@ -213,6 +213,13 @@ namespace ManagementLibrarySample
                 Console.WriteLine($"    {quota.Name.Value}: {quota.CurrentValue} {quota.Unit}");
             }
 
+            // Get the publishing profile xml file
+            using (var stream = await _websiteClient.Sites.ListSitePublishingProfileXmlAsync(rgName, siteName, new CsmPublishingProfileOptions()))
+            {
+                string profileXml = await (new StreamReader(stream)).ReadToEndAsync();
+                Console.WriteLine(profileXml);
+            }
+
             // Restart the site
             await _websiteClient.Sites.RestartSiteAsync(rgName, siteName, softRestart: true);
         }
