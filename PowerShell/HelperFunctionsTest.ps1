@@ -86,6 +86,16 @@ Write-Host "Setting the PHP version and reading it back"
 SetPHPVersion $ResourceGroupName $SiteName 5.6
 GetPHPVersion $ResourceGroupName $SiteName
 
+Write-Host "Set a virtual application"
+$props=@{
+    virtualApplications = @(
+        @{ virtualPath = "/"; physicalPath = "site\wwwroot" },
+        @{ virtualPath = "/bar"; physicalPath = "site\wwwroot" }
+    )
+}
+SetWebAppConfig $ResourceGroupName $SiteName $props
+
+
 Write-Host "Installing site extension"
 InstallSiteExtension $ResourceGroupName $SiteName filecounter
 Write-Host "Listing installed site extensions"
