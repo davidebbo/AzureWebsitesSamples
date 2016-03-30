@@ -173,6 +173,8 @@ namespace ManagementLibrarySample
             };
             site = await _websiteClient.Sites.CreateOrUpdateSiteAsync(rgName, siteName, site);
 
+            Console.WriteLine($"Site outbound IP addresses: {site.OutboundIpAddresses}");
+
             // Create/Update the Website configuration
             var siteConfig = new SiteConfig
             {
