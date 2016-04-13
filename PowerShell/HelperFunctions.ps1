@@ -251,7 +251,7 @@ Function ListWebAppSiteExtensions($ResourceGroupName, $SiteName)
 # Example call: InstallSiteExtension MyResourceGroup MySite filecounter
 Function InstallSiteExtension($ResourceGroupName, $SiteName, $Name)
 {
-    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName/$Name -PropertyObject @{} -ApiVersion $WebAppApiVersion -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName/$Name -PropertyObject @{} -ApiVersion $WebAppApiVersion -Force
 }
 
 # Example call: UninstallSiteExtension MyResourceGroup MySite filecounter
