@@ -240,6 +240,39 @@ Function RunTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName)
 }
 
 
+## Functions operations
+
+Function DeployHttpTriggerFunction($ResourceGroupName, $SiteName, $FunctionName, $CodeFile, $TestData)
+{
+    $FileContent = "$(Get-Content -Path $CodeFile -Raw)"
+
+    $props = @{
+        config = @{
+            bindings = @(
+                @{
+                    type = "httpTrigger"
+                    direction = "in"
+                    webHookType = ""
+                    name = "req"
+                }
+                @{
+                    type = "http"
+                    direction = "out"
+                    name = "res"
+                }
+            )
+        }
+        files = @{
+            "index.js" = $FileContent
+        }
+        test_data = $TestData
+    }
+
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/functions -ResourceName $SiteName/$FunctionName -PropertyObject $props -ApiVersion 2015-08-01 -Force
+}
+
+
+
 ## Site extension operations
 
 # Example call: ListWebAppSiteExtensions MyResourceGroup MySite
