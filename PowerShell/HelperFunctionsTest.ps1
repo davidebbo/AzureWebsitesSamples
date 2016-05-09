@@ -86,6 +86,12 @@ Write-Host "Setting the PHP version and reading it back"
 SetPHPVersion $ResourceGroupName $SiteName 5.6
 GetPHPVersion $ResourceGroupName $SiteName
 
+Write-Host "Turn on app logs"
+TurnOnApplicationLogs $ResourceGroupName $SiteName Verbose
+
+Write-Host "Reading the log settings"
+GetWebAppLogSettings $ResourceGroupName $SiteName
+
 Write-Host "Set a virtual application"
 $props=@{
     virtualApplications = @(

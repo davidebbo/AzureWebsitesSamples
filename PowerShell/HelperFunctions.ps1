@@ -172,6 +172,26 @@ Function SetSlotSettings($ResourceGroupName, $SiteName, $SlotSettingsObject)
 }
 
 
+## Log settings
+
+Function GetWebAppLogSettings($ResourceGroupName, $SiteName)
+{
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/config -ResourceName $SiteName/logs -ApiVersion $WebAppApiVersion
+}
+
+Function TurnOnApplicationLogs($ResourceGroupName, $SiteName, $Level)
+{
+    $props = @{
+        applicationLogs = @{
+            fileSystem = @{
+                level = $Level
+            }
+        }
+    }
+
+    Set-AzureRmResource -PropertyObject $props -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/config -ResourceName $SiteName/logs -ApiVersion $WebAppApiVersion -Force
+}
+
 
 ## Deployment related operations
 
