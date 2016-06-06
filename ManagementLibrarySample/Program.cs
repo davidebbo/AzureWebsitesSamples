@@ -14,6 +14,8 @@ using Microsoft.Azure.Management.WebSites.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using Microsoft.Rest.Azure;
+using Microsoft.Azure.Management.Dns;
+using Microsoft.Azure.Management.Dns.Models;
 
 namespace ManagementLibrarySample
 {
@@ -22,6 +24,7 @@ namespace ManagementLibrarySample
         private static ResourceManagementClient _resourceGroupClient;
         private static WebSiteManagementClient _websiteClient;
         private static AzureEnvironment _environment;
+        private static DnsManagementClient _dnsClient;
 
         static void Main(string[] args)
         {
@@ -55,17 +58,72 @@ namespace ManagementLibrarySample
             _resourceGroupClient.SubscriptionId = cloudCreds.SubscriptionId;
             _websiteClient = new WebSiteManagementClient(_environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), tokenCreds, loggingHandler);
             _websiteClient.SubscriptionId = cloudCreds.SubscriptionId;
+            _dnsClient = new DnsManagementClient(cloudCreds);
 
             await ListResourceGroupsAndSites();
 
             // Note: site names are globally unique, so you may need to change it to avoid conflicts
             await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI", "West US");
 
+            // if you have a configured  Azure DNS Zone you can add subdomains (i.e. subdomain.mydomain.com )
+         //   await CreateOrUpdateCNAME("MyResourceGroup", "My DNS Zone", "subdomain", "mywebsite.azurewebsites.net");
+
             // Upload certificate to resource group
             await UpdateLoadCertificate("MyResourceGroup", "CertificateName", "West US", "PathToPfxFile", "CertificatePassword");
 
             // Bind certificate to resource group
             await BindCertificateToSite("MyResourceGroup", "SiteName", "CertificateName", "hostName");
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="resourceGroupName"></param>
+        /// <param name="dnsZoneName"></param>
+        /// <param name="cNAME">subdomain</param>
+        /// <param name="alias">i.e. MYWEBSITE.azurewebsites.net</param>
+        /// <returns></returns>
+        private async static Task<Boolean> CreateOrUpdateCNAME(string resourceGroupName, string dnsZoneName, string cNAME, string alias)
+        {
+
+            var item = _dnsClient.Zones;
+            var myzone = _dnsClient.Zones.Get("cofire", "cofire.test");
+            cNAME = (cNAME.IndexOf('.') == -1) ? cNAME : cNAME.Substring(0, cNAME.IndexOf('.'));
+
+            try
+            {
+                RecordSet newCName1 = new RecordSet("global");
+                newCName1.Properties = new RecordSetProperties();
+                newCName1.Properties.Ttl = 10800;
+                newCName1.Properties.CnameRecord = new CnameRecord($"{alias}.");
+                newCName1.Type = "CNAME";
+                newCName1.Location = "global";
+                newCName1.Name = cNAME;
+
+
+                var responseETagUpdate =
+                    await _dnsClient.RecordSets.CreateOrUpdateAsync(resourceGroupName, dnsZoneName, cNAME, RecordType.CNAME,
+                    new RecordSetCreateOrUpdateParameters(newCName1), null, null);
+
+                if (responseETagUpdate.StatusCode == System.Net.HttpStatusCode.Created || responseETagUpdate.StatusCode == System.Net.HttpStatusCode.OK)
+                    return true;
+                else
+                    return false;
+
+            }
+            catch (Hyak.Common.CloudException e)
+            {
+                //  check if the precondition failed
+                if (e.Response.StatusCode == System.Net.HttpStatusCode.PreconditionFailed)
+                {
+                    Console.WriteLine("The ETag precondition failed");
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+            return false;
+
         }
 
         private static Task UpdateLoadCertificate(string resourceGroupName, string certificateName, string location, string pathToPfxFile, string certificatePassword)
@@ -86,8 +144,16 @@ namespace ManagementLibrarySample
         {
             var certificate = _websiteClient.Certificates.GetCertificate(resourceGroupName, certificateName);
             var site = _websiteClient.Sites.GetSite(resourceGroupName, siteName);
-            
-            if(!site.HostNames.Any(h => string.Equals(h, hostName, StringComparison.OrdinalIgnoreCase)))
+
+            var hst = new HostNameBinding();
+            hst.Name = siteName;
+            hst.Name = $"{siteName}/{hostName}";
+            hst.Location = site.Location;
+
+            var doms3 = _websiteClient.Sites.CreateOrUpdateSiteHostNameBinding(resourceGroupName, siteName, hostName, hst);
+
+
+            if (!site.HostNames.Any(h => string.Equals(h, hostName, StringComparison.OrdinalIgnoreCase)))
             {
                 site.HostNames.Add(hostName);
             }
