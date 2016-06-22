@@ -259,6 +259,16 @@ Function RunTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName)
     Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/TriggeredWebJobs -ResourceName $SiteName/$WebJobName -Action run -ApiVersion $WebAppApiVersion -Force
 }
 
+Function StartContinuousWebJob($ResourceGroupName, $SiteName, $WebJobName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/ContinuousWebJobs -ResourceName $SiteName/$WebJobName -Action start -ApiVersion $WebAppApiVersion -Force
+}
+
+Function StopContinuousWebJob($ResourceGroupName, $SiteName, $WebJobName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/ContinuousWebJobs -ResourceName $SiteName/$WebJobName -Action stop -ApiVersion $WebAppApiVersion -Force
+}
+
 
 ## Functions operations
 
