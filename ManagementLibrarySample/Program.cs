@@ -65,14 +65,16 @@ namespace ManagementLibrarySample
             // Note: site names are globally unique, so you may need to change it to avoid conflicts
             await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI", "West US");
 
+            // NOTE: uncomment lines below and change parameters as appropriate
+
             // if you have a configured  Azure DNS Zone you can add subdomains (i.e. subdomain.mydomain.com )
-         //   await CreateOrUpdateCNAME("MyResourceGroup", "My DNS Zone", "subdomain", "mywebsite.azurewebsites.net");
+            //await CreateOrUpdateCNAME("MyResourceGroup", "My DNS Zone", "subdomain", "mywebsite.azurewebsites.net");
 
             // Upload certificate to resource group
-            await UpdateLoadCertificate("MyResourceGroup", "CertificateName", "West US", "PathToPfxFile", "CertificatePassword");
+            //await UpdateLoadCertificate("MyResourceGroup", "CertificateName", "West US", "PathToPfxFile", "CertificatePassword");
 
             // Bind certificate to resource group
-            await BindCertificateToSite("MyResourceGroup", "SiteName", "CertificateName", "hostName");
+            //await BindCertificateToSite("MyResourceGroup", "SiteName", "CertificateName", "hostName");
         }
         /// <summary>
         /// 
