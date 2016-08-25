@@ -58,6 +58,12 @@ Function CreateWebApp($ResourceGroupName, $Location, $SiteName, $PlanName)
     New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject @{ webHostingPlan = $PlanName } -ApiVersion $WebAppApiVersion -Force
 }
 
+# Example call: SetWebApp MyResourceGroup MySite $ConfigObject
+Function SetWebApp($ResourceGroupName, $SiteName, $ConfigObject)
+{
+    Set-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject $ConfigObject -ApiVersion $WebAppApiVersion -Force
+}
+
 # Example call: DeleteWebApp MyResourceGroup MySite
 Function DeleteWebApp($ResourceGroupName, $SiteName)
 {

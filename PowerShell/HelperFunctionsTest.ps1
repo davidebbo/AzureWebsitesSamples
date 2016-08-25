@@ -21,6 +21,9 @@ CreateWebApp $ResourceGroupName $Location $SiteName $PlanName
 Write-Host "Listing all Web Apps in the Resource Group"
 ListWebApps $ResourceGroupName
 
+Write-Host "Turn off client affinity"
+SetWebApp $ResourceGroupName $SiteName @{ "clientAffinityEnabled" = $false }
+
 Write-Host "Hooking up site to an external git repo"
 HookupExternalGitRepo $ResourceGroupName $SiteName https://github.com/davidebbo-test/TrivialAppAndWebJob
 
