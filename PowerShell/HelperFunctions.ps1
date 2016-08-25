@@ -308,7 +308,7 @@ Function DeployHttpTriggerFunction($ResourceGroupName, $SiteName, $FunctionName,
 # Example call: ListWebAppSiteExtensions MyResourceGroup MySite
 Function ListWebAppSiteExtensions($ResourceGroupName, $SiteName)
 {
-    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName -ApiVersion $WebAppApiVersion -IsCollection
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/siteextensions -Name $SiteName -ApiVersion $WebAppApiVersion
 }
 
 # Example call: InstallSiteExtension MyResourceGroup MySite filecounter
@@ -351,7 +351,7 @@ Function DeleteCert($ResourceGroupName, $CertName)
 
 Function GetWebAppAddons($ResourceGroupName, $SiteName)
 {
-    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName -ApiVersion $WebAppApiVersion -IsCollection
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/premieraddons -Name $SiteName -ApiVersion $WebAppApiVersion
 }
 
 Function AddZrayAddon($ResourceGroupName, $Location, $SiteName, $Name, $PlanName)
