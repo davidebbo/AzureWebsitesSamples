@@ -382,3 +382,15 @@ Function SyncWebApp($ResourceGroupName, $SiteName)
 {
     Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName  -Action sync -ApiVersion $WebAppApiVersion -Force
 }
+
+## Deployment creds (user level, NOT site level!)
+
+Function SetDeploymentCredentials($UserName, $Password)
+{
+    $props = @{
+        publishingUserName = $UserName
+        publishingPassword = $Password
+    }
+
+    Set-AzureRmResource -Properties $props -ResourceId /providers/Microsoft.Web/publishingUsers/web -ApiVersion 2015-08-01 -Force
+}
