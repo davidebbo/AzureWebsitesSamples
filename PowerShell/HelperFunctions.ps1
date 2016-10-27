@@ -100,6 +100,13 @@ Function StartWebApp($ResourceGroupName, $SiteName)
     Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -Action start -ApiVersion $WebAppApiVersion -Force
 }
 
+# Example call: GetWebAppInstances MyResourceGroup MySite
+Function GetWebAppInstances($ResourceGroupName, $SiteName)
+{
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/instances -Name $SiteName -ApiVersion $WebAppApiVersion
+}
+
+
 
 ## Site config operations
 
