@@ -77,6 +77,29 @@ Function GetSiteAppServicePlanId($ResourceGroupName, $SiteName)
     $site.Properties.serverFarmId
 }
 
+# Example call: StopWebApp MyResourceGroup MySite
+Function StopWebApp($ResourceGroupName, $SiteName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -Action stop -ApiVersion $WebAppApiVersion -Force
+}
+
+# Example call: StopWebAppAndScm MyResourceGroup MySite
+Function StopWebAppAndScm($ResourceGroupName, $SiteName)
+{
+    $props = @{
+        state = "stopped"
+        scmSiteAlsoStopped = $true
+    }
+
+    Set-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject $props -ApiVersion $WebAppApiVersion -Force
+}
+
+# Example call: StartWebApp MyResourceGroup MySite
+Function StartWebApp($ResourceGroupName, $SiteName)
+{
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -Action start -ApiVersion $WebAppApiVersion -Force
+}
+
 
 ## Site config operations
 
@@ -103,29 +126,6 @@ Function GetPHPVersion($ResourceGroupName, $SiteName)
 Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
 {
     SetWebAppConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion }
-}
-
-# Example call: StopWebApp MyResourceGroup MySite
-Function StopWebApp($ResourceGroupName, $SiteName)
-{
-    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -Action stop -ApiVersion $WebAppApiVersion -Force
-}
-
-# Example call: StopWebAppAndScm MyResourceGroup MySite
-Function StopWebAppAndScm($ResourceGroupName, $SiteName)
-{
-    $props = @{
-        state = "stopped"
-        scmSiteAlsoStopped = $true
-    }
-
-    Set-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -PropertyObject $props -ApiVersion $WebAppApiVersion -Force
-}
-
-# Example call: StartWebApp MyResourceGroup MySite
-Function StartWebApp($ResourceGroupName, $SiteName)
-{
-    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -Name $SiteName -Action start -ApiVersion $WebAppApiVersion -Force
 }
 
 
