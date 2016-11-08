@@ -29,7 +29,14 @@
         "2"
       ],
       "defaultValue":"0"
-    }
+    },
+	"githubUrl": {
+		"type":"string"
+	},
+	"githubBranch": {
+		"type":"string",
+		"defaultValue":"master"
+	}
   },
   "resources":[
     {
@@ -64,8 +71,8 @@
             "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
           ],
           "properties":{
-            "RepoUrl":"https://github.com/davidebbo-test/Mvc52Application.git",
-            "branch":"master"
+            "RepoUrl":"[parameters('githubUrl')]",
+            "branch":"[parameters('githubBranch')]"
           }
         }
       ]
