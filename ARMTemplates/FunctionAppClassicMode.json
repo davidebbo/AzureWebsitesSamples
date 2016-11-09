@@ -65,8 +65,7 @@
           "properties": {
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
-            "AZUREJOBS_EXTENSION_VERSION": "beta",
-            "FUNCTIONS_EXTENSION_VERSION": "~0.7"
+            "FUNCTIONS_EXTENSION_VERSION": "~1"
           }
         }
       ]
