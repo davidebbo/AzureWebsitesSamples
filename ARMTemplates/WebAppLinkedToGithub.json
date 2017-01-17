@@ -30,13 +30,13 @@
       ],
       "defaultValue":"0"
     },
-	"githubUrl": {
-		"type":"string"
-	},
-	"githubBranch": {
-		"type":"string",
-		"defaultValue":"master"
-	}
+    "githubUrl": {
+      "type":"string"
+    },
+    "githubBranch": {
+      "type":"string",
+      "defaultValue":"master"
+    }
   },
   "resources":[
     {
