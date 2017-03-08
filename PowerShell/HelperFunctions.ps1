@@ -287,7 +287,7 @@ Function StopContinuousWebJob($ResourceGroupName, $SiteName, $WebJobName)
 
 Function SyncFunctionAppTriggers($ResourceGroupName, $SiteName)
 {
-    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ResourceName $SiteName/$WebJobName -Action syncfunctiontriggers -ApiVersion $WebAppApiVersion -Force
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ResourceName $SiteName -Action syncfunctiontriggers -ApiVersion $WebAppApiVersion -Force
 }
 
 Function DeployHttpTriggerFunction($ResourceGroupName, $SiteName, $FunctionName, $CodeFile, $TestData)
