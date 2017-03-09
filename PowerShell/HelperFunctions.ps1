@@ -111,32 +111,37 @@ Function GetWebAppInstances($ResourceGroupName, $SiteName)
 ## Site config operations
 
 # Example call: GetWebAppConfig MyResourceGroup MySite
-Function GetWebAppConfig($ResourceGroupName, $SiteName)
+Function GetWebAppConfig($ResourceGroupName, $SiteName, $Slot)
 {
-    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -ApiVersion $WebAppApiVersion
+    $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
+
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/Config -Name $ResourceName/web -ApiVersion $WebAppApiVersion
 }
 
+
 # Example call: SetWebAppConfig MyResourceGroup MySite $ConfigObject
-Function SetWebAppConfig($ResourceGroupName, $SiteName, $ConfigObject)
+Function SetWebAppConfig($ResourceGroupName, $SiteName, $ConfigObject, $Slot)
 {
-    Set-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/web -PropertyObject $ConfigObject -ApiVersion $WebAppApiVersion -Force
+    $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
+
+    Set-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/Config -Name $ResourceName/web -PropertyObject $ConfigObject -ApiVersion $WebAppApiVersion -Force
 }
 
 # Example call: $phpVersion = GetPHPVersion MyResourceGroup MySite
-Function GetPHPVersion($ResourceGroupName, $SiteName)
+Function GetPHPVersion($ResourceGroupName, $SiteName, $Slot)
 {
-    $config = GetWebAppConfig $ResourceGroupName $SiteName
+    $config = GetWebAppConfig $ResourceGroupName $SiteName $Slot
     $config.Properties.phpVersion
 }
 
 # Example call: SetPHPVersion MyResourceGroup MySite 5.6
-Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
+Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion, $Slot)
 {
-    SetWebAppConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion }
+    SetWebAppConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion } $Slot
 }
 
 # Example call: SetCorsUrls MyResourceGroup MySite @("http://foo.com", "http://bar.com")
-Function SetCorsUrls($ResourceGroupName, $SiteName, $CorsUrls)
+Function SetCorsUrls($ResourceGroupName, $SiteName, $CorsUrls, $Slot)
 {
     $cors = @{
         allowedOrigins = $CorsUrls
@@ -415,3 +420,20 @@ Function SetDeploymentCredentials($UserName, $Password)
 
     Set-AzureRmResource -Properties $props -ResourceId /providers/Microsoft.Web/publishingUsers/web -ApiVersion 2015-08-01 -Force
 }
+
+
+## Helper method
+
+# This deals with the type/name differences in the slot vs no-slot cases
+Function GetResourceTypeAndName($SiteName, $Slot)
+{
+    $ResourceType = "Microsoft.Web/sites"
+    $ResourceName = $SiteName
+    if ($Slot) {
+        $ResourceType = "$($ResourceType)/slots"
+        $ResourceName = "$($ResourceName)/$($Slot)"
+    }
+
+    $ResourceType,$ResourceName
+}
+
