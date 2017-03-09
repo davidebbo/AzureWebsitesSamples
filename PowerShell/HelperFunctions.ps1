@@ -134,7 +134,7 @@ Function GetPHPVersion($ResourceGroupName, $SiteName, $Slot)
     $config.Properties.phpVersion
 }
 
-# Example call: SetPHPVersion MyResourceGroup MySite 5.6
+# Example call: SetPHPVersion MyResourceGroup MySite "5.6"
 Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion, $Slot)
 {
     SetWebAppConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion } $Slot

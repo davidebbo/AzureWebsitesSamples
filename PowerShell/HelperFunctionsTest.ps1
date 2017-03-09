@@ -86,7 +86,7 @@ SetSlotSettings $ResourceGroupName $SiteName @{ appSettingNames = @("key1"); con
 GetSlotSettings $ResourceGroupName $SiteName
 
 Write-Host "Setting the PHP version and reading it back"
-SetPHPVersion $ResourceGroupName $SiteName 5.6
+SetPHPVersion $ResourceGroupName $SiteName "7.0"
 GetPHPVersion $ResourceGroupName $SiteName
 
 Write-Host "Turn on app logs"
