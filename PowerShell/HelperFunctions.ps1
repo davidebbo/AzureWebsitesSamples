@@ -135,6 +135,15 @@ Function SetPHPVersion($ResourceGroupName, $SiteName, $PHPVersion)
     SetWebAppConfig $ResourceGroupName $SiteName @{ "phpVersion" = $PHPVersion }
 }
 
+# Example call: SetCorsUrls MyResourceGroup MySite @("http://foo.com", "http://bar.com")
+Function SetCorsUrls($ResourceGroupName, $SiteName, $CorsUrls)
+{
+    $cors = @{
+        allowedOrigins = $CorsUrls
+    }
+
+    SetWebAppConfig $ResourceGroupName $SiteName @{ "cors" = $cors }
+}
 
 
 ## App Settings
