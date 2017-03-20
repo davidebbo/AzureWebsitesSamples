@@ -251,11 +251,11 @@ Function TurnOnApplicationLogs($ResourceGroupName, $SiteName, $Level, $Slot)
 ## Deployment related operations
 
 # Example call: DeployCloudHostedPackage MyResourceGroup "West US" MySite https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
-Function DeployCloudHostedPackage($ResourceGroupName, $Location, $SiteName, $packageUrl, $Slot)
+Function DeployCloudHostedPackage($ResourceGroupName, $SiteName, $packageUrl, $Slot)
 {
     $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
 
-    New-AzureRmResource -ResourceGroupName $ResourceGroupName -Location $Location -ResourceType $ResourceType/Extensions -Name $ResourceName/MSDeploy -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion $WebAppApiVersion -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/Extensions -Name $ResourceName/MSDeploy -PropertyObject @{ "packageUri" = $packageUrl } -ApiVersion $WebAppApiVersion -Force
 }
 
 # Example call: GetPublishingProfile MyResourceGroup "MySite
