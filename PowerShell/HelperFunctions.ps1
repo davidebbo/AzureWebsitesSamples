@@ -385,6 +385,14 @@ Function DeployHttpTriggerFunction($ResourceGroupName, $SiteName, $FunctionName,
     New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/functions -ResourceName $SiteName/$FunctionName -PropertyObject $props -ApiVersion 2015-08-01 -Force
 }
 
+Function GetFunctionInvokeUrl($ResourceGroupName, $SiteName, $FunctionName, $Slot)
+{
+    $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
+
+    Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/Functions -ResourceName $SiteName/$FunctionName -Action listsecrets -ApiVersion $WebAppApiVersion -Force
+}
+
+
 
 
 ## Site extension operations
