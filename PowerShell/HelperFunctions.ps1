@@ -322,6 +322,16 @@ Function GetTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName, $Slot)
     Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/TriggeredWebJobs -Name $ResourceName/$WebJobName -ApiVersion $WebAppApiVersion
 }
 
+# Example call: GetTriggeredWebJobHistory MyResourceGroup MySite MyWebJob
+Function GetTriggeredWebJobHistory($ResourceGroupName, $SiteName, $WebJobName, $Slot)
+{
+    $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
+
+    # Use -ResourceId because Get-AzureRmResource doesn't support listing collections at the Resource Provider level
+    $Subscription = (Get-AzureRmContext).Subscription.SubscriptionId
+    Get-AzureRmResource -ResourceId /subscriptions/$Subscription/resourceGroups/$ResourceGroupName/providers/Microsoft.Web/sites/$SiteName/TriggeredWebJobs/$WebJobName/history -ApiVersion 2015-08-01
+}
+
 # Example call: RunTriggeredWebJob MyResourceGroup MySite MyWebJob
 Function RunTriggeredWebJob($ResourceGroupName, $SiteName, $WebJobName, $Slot)
 {
