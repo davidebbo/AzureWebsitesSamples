@@ -495,10 +495,8 @@ Function SyncWebApp($ResourceGroupName, $SiteName, $Slot)
 
 ## Deployment creds (user level, NOT site level!)
 
-Function SetDeploymentCredentials($UserName, $Password, $Slot)
+Function SetDeploymentCredentials($UserName, $Password)
 {
-    $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
-
     $props = @{
         publishingUserName = $UserName
         publishingPassword = $Password
