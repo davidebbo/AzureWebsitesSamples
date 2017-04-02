@@ -63,7 +63,7 @@ namespace ManagementLibrarySample
             await ListResourceGroupsAndSites();
 
             // Note: site names are globally unique, so you may need to change it to avoid conflicts
-            await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI", "West US");
+            await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI7", "West US");
 
             // NOTE: uncomment lines below and change parameters as appropriate
 
@@ -131,28 +131,29 @@ namespace ManagementLibrarySample
         private static Task UpdateLoadCertificate(string resourceGroupName, string certificateName, string location, string pathToPfxFile, string certificatePassword)
         {
             var pfxAsBytes = File.ReadAllBytes(pathToPfxFile);
-            var pfxBlob = Convert.ToBase64String(pfxAsBytes);
             var certificate = new Certificate
             {
                 Location = location,
                 Password = certificatePassword,
-                PfxBlob = pfxBlob
+                PfxBlob = pfxAsBytes
             };
 
-            return _websiteClient.Certificates.CreateOrUpdateCertificateAsync(resourceGroupName, certificateName, certificate);
+            return _websiteClient.Certificates.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName, certificateName, certificate);
         }
 
-        private static Task BindCertificateToSite(string resourceGroupName, string siteName, string certificateName, string hostName)
+        private static async Task BindCertificateToSite(string resourceGroupName, string siteName, string certificateName, string hostName)
         {
-            var certificate = _websiteClient.Certificates.GetCertificate(resourceGroupName, certificateName);
-            var site = _websiteClient.Sites.GetSite(resourceGroupName, siteName);
+            var certificateResponse = await _websiteClient.Certificates.GetWithHttpMessagesAsync(resourceGroupName, certificateName);
+            var certificate = certificateResponse.Body;
+            var siteResponse = await _websiteClient.WebApps.GetWithHttpMessagesAsync(resourceGroupName, siteName);
+            var site = siteResponse.Body;
 
             var hst = new HostNameBinding();
             hst.Name = siteName;
             hst.Name = $"{siteName}/{hostName}";
             hst.Location = site.Location;
 
-            var doms3 = _websiteClient.Sites.CreateOrUpdateSiteHostNameBinding(resourceGroupName, siteName, hostName, hst);
+            var doms3 = await _websiteClient.WebApps.CreateOrUpdateHostNameBindingWithHttpMessagesAsync(resourceGroupName, siteName, hostName, hst);
 
 
             if (!site.HostNames.Any(h => string.Equals(h, hostName, StringComparison.OrdinalIgnoreCase)))
@@ -176,7 +177,7 @@ namespace ManagementLibrarySample
                 });
             }
 
-            return _websiteClient.Sites.CreateOrUpdateSiteAsync(resourceGroupName, siteName, site);
+            await _websiteClient.WebApps.CreateOrUpdateAsync(resourceGroupName, siteName, site);
         }
 
         private static TokenCloudCredentials GetCredsFromServicePrincipal()
@@ -208,8 +209,8 @@ namespace ManagementLibrarySample
                 Console.WriteLine(rg.Name);
 
                 // Go through all the Websites in the resource group
-                var siteListResult = await _websiteClient.Sites.GetSitesAsync(rg.Name, null);
-                foreach (var site in siteListResult.Value)
+                var siteListResult = await _websiteClient.WebApps.ListByResourceGroupWithHttpMessagesAsync(rg.Name);
+                foreach (var site in siteListResult.Body)
                 {
                     Console.WriteLine("    " + site.Name);
                 }
@@ -222,7 +223,7 @@ namespace ManagementLibrarySample
             var rgCreateResult = await _resourceGroupClient.ResourceGroups.CreateOrUpdateAsync(rgName, new ResourceGroup { Location = location });
 
             // Create/Update the App Service Plan
-            var serverFarmWithRichSku = new ServerFarmWithRichSku
+            var serverFarmWithRichSku = new AppServicePlan
             {
                 Location = location,
                 Sku = new SkuDescription
@@ -231,7 +232,7 @@ namespace ManagementLibrarySample
                     Tier = "Free"
                 }
             };
-            serverFarmWithRichSku = await _websiteClient.ServerFarms.CreateOrUpdateServerFarmAsync(rgName, appServicePlanName, serverFarmWithRichSku);
+            serverFarmWithRichSku = await _websiteClient.AppServicePlans.CreateOrUpdateAsync(rgName, appServicePlanName, serverFarmWithRichSku);
 
             // Create/Update the Website
             var site = new Site
@@ -239,7 +240,7 @@ namespace ManagementLibrarySample
                 Location = location,
                 ServerFarmId = appServicePlanName
             };
-            site = await _websiteClient.Sites.CreateOrUpdateSiteAsync(rgName, siteName, site);
+            site = await _websiteClient.WebApps.CreateOrUpdateAsync(rgName, siteName, site);
 
             Console.WriteLine($"Site outbound IP addresses: {site.OutboundIpAddresses}");
 
@@ -249,7 +250,7 @@ namespace ManagementLibrarySample
                 Location = location,
                 PhpVersion = "5.6"
             };
-            siteConfig = await _websiteClient.Sites.CreateOrUpdateSiteConfigAsync(rgName, siteName, siteConfig);
+            siteConfig = await _websiteClient.WebApps.CreateOrUpdateConfigurationAsync(rgName, siteName, siteConfig);
 
             // Create/Update some App Settings
             var appSettings = new StringDictionary
@@ -261,7 +262,7 @@ namespace ManagementLibrarySample
                     { "MySecondKey", "My second value" }
                 }
             };
-            await _websiteClient.Sites.UpdateSiteAppSettingsAsync(rgName, siteName, appSettings);
+            await _websiteClient.WebApps.UpdateApplicationSettingsAsync(rgName, siteName, appSettings);
 
             // Create/Update some Connection Strings
             var connStrings = new ConnectionStringDictionary
@@ -269,29 +270,29 @@ namespace ManagementLibrarySample
                 Location = location,
                 Properties = new Dictionary<string, ConnStringValueTypePair>
                 {
-                    { "MyFirstConnString", new ConnStringValueTypePair { Value = "My SQL conn string", Type = DatabaseServerType.SQLAzure }},
-                    { "MySecondConnString", new ConnStringValueTypePair { Value = "My custom conn string", Type = DatabaseServerType.Custom }}
+                    { "MyFirstConnString", new ConnStringValueTypePair { Value = "My SQL conn string", Type = ConnectionStringType.SQLAzure }},
+                    { "MySecondConnString", new ConnStringValueTypePair { Value = "My custom conn string", Type = ConnectionStringType.Custom }}
                 }
             };
-            await _websiteClient.Sites.UpdateSiteConnectionStringsAsync(rgName, siteName, connStrings);
+            await _websiteClient.WebApps.UpdateConnectionStringsAsync(rgName, siteName, connStrings);
 
             // List the site quotas
             Console.WriteLine("Site quotas:");
-            CsmUsageQuotaCollection quotas = await _websiteClient.Sites.GetSiteUsagesAsync(rgName, siteName);
-            foreach (var quota in quotas.Value)
+            var quotas = await _websiteClient.WebApps.ListUsagesAsync(rgName, siteName);
+            foreach (var quota in quotas)
             {
                 Console.WriteLine($"    {quota.Name.Value}: {quota.CurrentValue} {quota.Unit}");
             }
 
             // Get the publishing profile xml file
-            using (var stream = await _websiteClient.Sites.ListSitePublishingProfileXmlAsync(rgName, siteName, new CsmPublishingProfileOptions()))
+            using (var stream = await _websiteClient.WebApps.ListPublishingProfileXmlWithSecretsAsync(rgName, siteName, new CsmPublishingProfileOptions()))
             {
                 string profileXml = await (new StreamReader(stream)).ReadToEndAsync();
                 Console.WriteLine(profileXml);
             }
 
             // Restart the site
-            await _websiteClient.Sites.RestartSiteAsync(rgName, siteName, softRestart: true);
+            await _websiteClient.WebApps.RestartAsync(rgName, siteName, softRestart: true);
         }
     }
 }
