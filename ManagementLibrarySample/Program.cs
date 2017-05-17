@@ -58,12 +58,12 @@ namespace ManagementLibrarySample
             _resourceGroupClient.SubscriptionId = cloudCreds.SubscriptionId;
             _websiteClient = new WebSiteManagementClient(_environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager), tokenCreds, loggingHandler);
             _websiteClient.SubscriptionId = cloudCreds.SubscriptionId;
-            _dnsClient = new DnsManagementClient(cloudCreds);
+            _dnsClient = new DnsManagementClient(tokenCreds);
 
             await ListResourceGroupsAndSites();
 
             // Note: site names are globally unique, so you may need to change it to avoid conflicts
-            await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI7", "West US");
+            await CreateSite("MyResourceGroup", "MyAppServicePlan", "SampleSiteFromAPI798", "West US");
 
             // NOTE: uncomment lines below and change parameters as appropriate
 
@@ -94,23 +94,23 @@ namespace ManagementLibrarySample
             try
             {
                 RecordSet newCName1 = new RecordSet("global");
-                newCName1.Properties = new RecordSetProperties();
-                newCName1.Properties.Ttl = 10800;
-                newCName1.Properties.CnameRecord = new CnameRecord($"{alias}.");
+                newCName1.TTL = 10800;
+                newCName1.CnameRecord = new CnameRecord($"{alias}.");
                 newCName1.Type = "CNAME";
-                newCName1.Location = "global";
+                //newCName1.Location = "global"; // What should this become?
                 newCName1.Name = cNAME;
 
-
-                var responseETagUpdate =
+                RecordSet responseETagUpdate =
                     await _dnsClient.RecordSets.CreateOrUpdateAsync(resourceGroupName, dnsZoneName, cNAME, RecordType.CNAME,
-                    new RecordSetCreateOrUpdateParameters(newCName1), null, null);
+                    newCName1, null, null);
 
-                if (responseETagUpdate.StatusCode == System.Net.HttpStatusCode.Created || responseETagUpdate.StatusCode == System.Net.HttpStatusCode.OK)
-                    return true;
-                else
-                    return false;
+                // What should this become?
+                //if (responseETagUpdate.StatusCode == System.Net.HttpStatusCode.Created || responseETagUpdate.StatusCode == System.Net.HttpStatusCode.OK)
+                //    return true;
+                //else
+                //    return false;
 
+                return true;
             }
             catch (Hyak.Common.CloudException e)
             {
