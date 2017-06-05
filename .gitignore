@@ -2,6 +2,7 @@
 [Bb]in/
 *.user
 /TestResults
+.vs
 *.vspscc
 *.vssscc
 deploy
