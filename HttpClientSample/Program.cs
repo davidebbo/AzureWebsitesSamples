@@ -10,6 +10,12 @@ namespace HttpClientSample
 {
     class Program
     {
+        const string ResourceGroup = "MyResourceGroup";
+        const string AppServicePlan = "MyAppServicePlan";
+        const string WebApp = "SampleSiteFromAPI";
+        const string FunctionApp = "SampleFunctionAppFromAPI";
+        const string Location = "West US";
+
         static string Subscription = ConfigurationManager.AppSettings["AzureSubscription"];
 
         static void Main(string[] args)
@@ -37,17 +43,13 @@ namespace HttpClientSample
                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                 client.BaseAddress = new Uri("https://management.azure.com/");
 
-                await MakeARMRequests(client);
+                await TestWebAppOperations(client);
+                await TestFunctionAppOperations(client);
             }
         }
 
-        static async Task MakeARMRequests(HttpClient client)
+        static async Task TestWebAppOperations(HttpClient client)
         {
-            const string ResourceGroup = "MyResourceGroup";
-            const string AppServicePlan = "MyAppServicePlan";
-            const string WebApp = "SampleSiteFromAPI777";
-            const string Location = "West US";
-
             // Create the resource group
 
             using (var response = await client.PutAsJsonAsync(
@@ -160,6 +162,41 @@ namespace HttpClientSample
 
             using (var response = await client.DeleteAsync(
                 $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{WebApp}?api-version=2016-03-01"))
+            {
+                response.EnsureSuccessStatusCode();
+            }
+        }
+
+        static async Task TestFunctionAppOperations(HttpClient client)
+        {
+            // Create the Web App
+
+            using (var response = await client.PutAsJsonAsync(
+                $"/subscriptions/{Subscription}/resourceGroups/{ResourceGroup}/providers/Microsoft.Web/sites/{FunctionApp}?api-version=2016-03-01",
+                new
+                {
+                    location = Location,
+                    kind = "functionapp",
+                    properties = new
+                    {
+                        siteConfig = new
+                        {
+                            appSettings = new object[]
+                            {
+                                new
+                                {
+                                    name = "FUNCTIONS_EXTENSION_VERSION",
+                                    value = "~1"
+                                },
+                                new
+                                {
+                                    name = "FOO",
+                                    value = "BAR"
+                                }
+                            }
+                        }
+                    }
+                }))
             {
                 response.EnsureSuccessStatusCode();
             }
