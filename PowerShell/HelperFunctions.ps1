@@ -250,6 +250,8 @@ Function TurnOnApplicationLogs($ResourceGroupName, $SiteName, $Level, $Slot)
 
 ## Deployment related operations
 
+# See also https://github.com/projectkudu/kudu/wiki/Deploying-a-WebJob-using-PowerShell-ARM-Cmdlets for related helpers
+
 # Example call: DeployCloudHostedPackage MyResourceGroup "West US" MySite https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 Function DeployCloudHostedPackage($ResourceGroupName, $SiteName, $packageUrl, $Slot)
 {
