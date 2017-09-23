@@ -58,7 +58,7 @@ Write-Host Running the triggered WebJob
 RunTriggeredWebJob $ResourceGroupName $SiteName $WebJobName
 
 Write-Host "Deploying bakery sample using msdeploy"
-DeployCloudHostedPackage $ResourceGroupName $Location $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
+DeployCloudHostedPackage $ResourceGroupName $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 
 Write-Host "Getting the publishing profile XML"
 GetPublishingProfile $ResourceGroupName $SiteName

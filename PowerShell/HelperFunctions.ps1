@@ -43,7 +43,7 @@ Function DeleteAppServicePlan($ResourceGroupName, $PlanName)
 # Example call: ListWebApps MyResourceGroup
 Function ListWebApps($ResourceGroupName)
 {
-    Find-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType -ApiVersion 2015-11-01
+    Find-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ApiVersion 2015-11-01
 }
 
 # Example call: GetWebApp MyResourceGroup MySite
@@ -212,14 +212,14 @@ Function SetWebAppConnectionStrings($ResourceGroupName, $SiteName, $ConnectionSt
 # Example call: GetSlotSettings MyResourceGroup MySite
 Function GetSlotSettings($ResourceGroupName, $SiteName)
 {
-    $res = Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/Config -Name $ResourceName/slotConfigNames -ApiVersion $WebAppApiVersion
+    $res = Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/slotConfigNames -ApiVersion $WebAppApiVersion
     $res.Properties
 }
 
 # Example call: SetSlotSettings MyResourceGroup MySite @{ appSettingNames = @("Setting1"); connectionStringNames = @("Conn1","Conn2") }
 Function SetSlotSettings($ResourceGroupName, $SiteName, $SlotSettingsObject)
 {
-    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/Config -Name $ResourceName/slotConfigNames -PropertyObject $SlotSettingsObject -ApiVersion $WebAppApiVersion -Force
+    New-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites/Config -Name $SiteName/slotConfigNames -PropertyObject $SlotSettingsObject -ApiVersion $WebAppApiVersion -Force
 }
 
 
@@ -229,7 +229,7 @@ Function GetWebAppLogSettings($ResourceGroupName, $SiteName, $Slot)
 {
     $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
 
-    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/config -ResourceName $SiteName/logs -ApiVersion $WebAppApiVersion
+    Get-AzureRmResource -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType/config -ResourceName $ResourceName/logs -ApiVersion $WebAppApiVersion
 }
 
 Function TurnOnApplicationLogs($ResourceGroupName, $SiteName, $Level, $Slot)
