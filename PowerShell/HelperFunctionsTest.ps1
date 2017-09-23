@@ -57,6 +57,9 @@ GetTriggeredWebJob $ResourceGroupName $SiteName $WebJobName
 Write-Host Running the triggered WebJob
 RunTriggeredWebJob $ResourceGroupName $SiteName $WebJobName
 
+Write-Host Getting the triggered WebJob history
+GetTriggeredWebJobHistory $ResourceGroupName $SiteName $WebJobName
+
 Write-Host "Deploying bakery sample using msdeploy"
 DeployCloudHostedPackage $ResourceGroupName $SiteName https://auxmktplceprod.blob.core.windows.net/packages/Bakery.zip
 
