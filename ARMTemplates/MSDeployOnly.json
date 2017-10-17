@@ -1,0 +1,26 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "msdeployPackageUrl": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[concat(parameters('appName'), '/MSDeploy')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.Web/sites/Extensions",
+      "properties": {
+        "packageUri": "[parameters('msdeployPackageUrl')]"
+      }
+    }
+  ]
+}
