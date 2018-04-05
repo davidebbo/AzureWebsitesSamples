@@ -39,6 +39,10 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), '2015-05-01-preview').key1)]"
             },
             {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[concat(toLower(parameters('appName')))]"
+            },
+            {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.5.0"
             }
