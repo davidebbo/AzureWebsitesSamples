@@ -115,14 +115,15 @@ ListWebAppSiteExtensions $ResourceGroupName $SiteName
 Write-Host "Uninstalling site extension"
 UninstallSiteExtension $ResourceGroupName $SiteName filecounter
 
-Write-Host "Enabling the ZRay addon"
-AddZrayAddon $ResourceGroupName $Location $SiteName MyZray "free"
+# Addons are deprecated
+#Write-Host "Enabling the ZRay addon"
+#AddZrayAddon $ResourceGroupName $Location $SiteName MyZray "free"
 
-Write-Host "Listing installed addons"
-GetWebAppAddons $ResourceGroupName $SiteName
+#Write-Host "Listing installed addons"
+#GetWebAppAddons $ResourceGroupName $SiteName
 
-Write-Host "Removing the ZRay addon"
-RemoveWebAppAddon $ResourceGroupName $SiteName MyZray
+#Write-Host "Removing the ZRay addon"
+#RemoveWebAppAddon $ResourceGroupName $SiteName MyZray
 
 Write-Host "Deleting the Web App"
 DeleteWebApp $ResourceGroupName $SiteName
