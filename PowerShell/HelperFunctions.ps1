@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$WebAppApiVersion = "2015-08-01"
+$WebAppApiVersion = "2018-02-01"
 
 ## WebHostingPlan operations
 
