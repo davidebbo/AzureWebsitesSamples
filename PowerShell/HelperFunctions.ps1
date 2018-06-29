@@ -359,6 +359,41 @@ Function StopContinuousWebJob($ResourceGroupName, $SiteName, $WebJobName, $Slot)
 
 ## Functions operations
 
+# Create a function app with app settings all in one create operation
+# Example call: CreateFunctionApp MyResourceGroup "West Central US" MyFunctionApp "full conn string..." "~1"
+Function CreateFunctionApp($ResourceGroupName, $Location, $SiteName, $StorageConnectionString, $FuncVersion)
+{
+    $functionTemplate = @{
+        ResourceGroupName = $ResourceGroupName
+        ResourceName = $SiteName
+        ResourceType = "Microsoft.Web/sites"
+        Kind = "functionapp"
+        Properties = @{
+            siteConfig = @{
+                appSettings = @(
+                    @{
+                        name = "AzureWebJobsStorage"
+                        value = $StorageConnectionString
+                    }
+                    @{
+                        name = "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"
+                        value = $StorageConnectionString
+                    }
+                    @{
+                        name = "FUNCTIONS_EXTENSION_VERSION"
+                        value = $FuncVersion
+                    }
+                )
+            }
+        }
+        Location = $Location
+        Force = $true
+    }
+
+    New-AzureRmResource @functionTemplate
+}
+
+
 Function SyncFunctionAppTriggers($ResourceGroupName, $SiteName, $Slot)
 {
     $ResourceType,$ResourceName = GetResourceTypeAndName $SiteName $Slot
