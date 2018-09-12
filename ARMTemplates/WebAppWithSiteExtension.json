@@ -39,7 +39,7 @@
           ],
           "properties": {
             "version": "0.5.3",
-            "feed_url": "https://www.siteextensions.net/api/v2/"
+            "feed_url": "https://www.nuget.org/api/v2/"
           }
         },
         {
