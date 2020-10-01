@@ -1,4 +1,4 @@
 AzureWebsitesSamples
 ====================
 
-A repository of Azure Websites related samples.
+A complete repository of Azure Websites related samples.
